@@ -1,0 +1,18 @@
+defmodule SmartThing do
+  @moduledoc """
+  Documentation for SmartThing.
+  """
+
+  @doc """
+  Hello world.
+
+  ## Examples
+
+      iex> SmartThing.hello
+      :world
+
+  """
+  def hello do
+    :world
+  end
+end
