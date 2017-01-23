@@ -5,9 +5,4 @@ defmodule Marvin.SmartThing do
 		Application.get_env(:smart_thing, :mock)
 	end
 
-  @doc "The runtime platform. Returns one of :brickpi, :ev3, :dev"
-  def platform() do
-		Application.get_env(:smart_thing, :platform)
-  end
-
 end

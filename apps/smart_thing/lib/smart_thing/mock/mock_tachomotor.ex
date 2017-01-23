@@ -4,15 +4,16 @@ defmodule Marvin.SmartThing.Mock.Tachomotor do
 	@behaviour Marvin.SmartThing.Sensing
 	@behaviour Marvin.SmartThing.Moving
 
-	require Logger
+	alias Marvin.SmartThing.Device
+  require Logger
 	
 	def new(type, port_name) do
-		%Ev3.Device{mod: Marvin.SmartThing.Mock,
-								class: :motor,
-								path: "/mock/#{type}_motor/#{port_name}", 
-								type: type,
-								mock: true,
-								port: port_name}
+		%Device{mod: Marvin.SmartThing.Mock,
+						class: :motor,
+						path: "/mock/#{type}_motor/#{port_name}", 
+						type: type,
+						mock: true,
+						port: port_name}
   end
 
  # Sensing

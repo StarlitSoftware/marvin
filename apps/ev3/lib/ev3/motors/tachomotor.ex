@@ -2,7 +2,7 @@ defmodule Marvin.Ev3.Tachomotor do
 	@moduledoc "A tacho motor"
 
 	@behaviour Marvin.SmartThing.Sensing
-	@behaviour Marvin.SMartThing.Moving
+	@behaviour Marvin.SmartThing.Moving
 
 	alias Marvin.SmartThing.Device
 	alias Marvin.Ev3.LegoMotor

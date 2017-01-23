@@ -1,45 +1,44 @@
 defmodule Marvin.Ev3.LegoLED do
 	@moduledoc "Lego LED access"
 
+	@behaviour Marvin.SmartThing.Lighting
+	
 	require Logger
 	import Marvin.Ev3.Sysfs
+	import Marvin.SmartThing.Utils, only: [mock?: 0]
 	alias Marvin.SmartThing.Device
-	alias Marvin.Ev3
+	alias Marvin.SmartThing.Mock
 	require Logger
 	
 	@sys_path "/sys/class/leds"
 	@ev3_prefix "ev3:"
 	@ev3_name_regex ~r/ev3:(.*):ev3dev/i
-  @brickpi_prefix "brickpi:"
-  @brickpi_name_regex ~r/brickpi:(.*):ev3dev/i
   
 
 	@doc "Get the available LEDs"
 	def leds() do
-    case Ev3.platform() do
-			:ev3 ->
-	 		  File.ls!(@sys_path)
-			  |> Enum.filter(&(String.starts_with?(&1, @ev3_prefix)))
-			  |> Enum.map(&(init_ev3_led("#{&1}", "#{@sys_path}/#{&1}")))
-      :brickpi ->
-        File.ls!(@sys_path)
-			  |> Enum.filter(&(String.starts_with?(&1, @brickpi_prefix)))
-			  |> Enum.map(&(init_brickpi_led("#{&1}", "#{@sys_path}/#{&1}")))              
-		  :dev ->
-			    [Ev3.Mock.LED.new(:green, :left),
-			     Ev3.Mock.LED.new(:green, :right),
-			     Ev3.Mock.LED.new(:red, :left),
-			     Ev3.Mock.LED.new(:red, :right),
-			     Ev3.Mock.LED.new(:blue, :left),
-			     Ev3.Mock.LED.new(:blue, :right)]
+    if mock?() do
+			[Mock.LED.new(:green, :left),
+			 Mock.LED.new(:green, :right),
+			 Mock.LED.new(:red, :left),
+			 Mock.LED.new(:red, :right),
+			 Mock.LED.new(:blue, :left),
+			 Mock.LED.new(:blue, :right)]
+		else
+	 		File.ls!(@sys_path)
+			|> Enum.filter(&(String.starts_with?(&1, @ev3_prefix)))
+			|> Enum.map(&(init_ev3_led("#{&1}", "#{@sys_path}/#{&1}")))
 		end
   end
+
 
   @doc "Find a led device by position and color, or nil"
 	def led(position: position, color: color) do
 		leds()
 		|> Enum.find(&(position(&1) == position and color(&1) == color))
 	end
+
+	# Lighting
 
 	@doc "Get left vs right position of the LED"
 	def position(led) do
@@ -66,7 +65,9 @@ defmodule Marvin.Ev3.LegoLED do
 		set_attribute(led, "brightness", value)
 		led
 	end
-
+	
+	###
+	
 	@doc "Execute an LED command"
 	def execute_command(led, command, params) do
 #		Logger.info("--- Executing LED #{led.path} #{command} #{inspect params}")

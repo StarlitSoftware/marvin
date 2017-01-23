@@ -3,7 +3,7 @@ defmodule Ev3.ColorSensor do
 	@behaviour Marvin.SmartThing.Sensing
 
   import Marvin.Ev3.Sysfs
-	alias Marvin.Ev3.LegoSensors
+	alias Marvin.Ev3.LegoSensor
 	require Logger
 
   @reflect "COL-REFLECT"

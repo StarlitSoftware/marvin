@@ -40,11 +40,12 @@ metadata: [:request_id]
 
 config :smart_thing,
 mock: true,
-platform: :dev, # platform in [:ev3, :dev]
+platform: Marvin.Ev3.Platform,
+display: Marvin.Ev3.Display
 
-config :pg2,
+config :pg2, # TODO move to community config
 nodes: [:"marvin@nerves-2091", :"rodney@nerves-5e58"],
-group: :lego
+group: :community
 
 import_config "nerves.exs"
 

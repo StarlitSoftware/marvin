@@ -3,12 +3,14 @@ defmodule Marvin.SmartThing.Mock.GyroSensor do
 
   @behaviour Marvin.SmartThing.Sensing
 
-  def new() do
-    %Marvin.SmartThing.Device{mod: Marvin.SmartThing.Mock,
-															class: :sensor,
-															path: "/mock/gyro_sensor",
-															type: :gyro,
-															mock: true}
+	alias Marvin.SmartThing.Device
+
+	def new() do
+    %Device{mod: Marvin.SmartThing.Mock,
+						class: :sensor,
+						path: "/mock/gyro_sensor",
+						type: :gyro,
+						mock: true}
   end
 
   ### Sensing

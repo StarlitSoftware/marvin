@@ -1,8 +1,11 @@
 defmodule Marvin.Ev3.LegoSound do
   @moduledoc "Lego sound playing"
 
+	@behaviour Marvin.SmartThing.Speaking
+
   require Logger
   alias Marvin.SmartThing.Device
+	import Marvin.SmartThing.Utils, only: [mock?: 0]
 
   @sys_path "/sound"
 
@@ -29,30 +32,30 @@ defmodule Marvin.Ev3.LegoSound do
     sound_player
   end
 
+	# Speaking
+	
   @doc "The sound player says out loud the given words"
   def speak(sound_player, words) do
     speak(words, volume_level(sound_player), speed_level(sound_player), voice(sound_player))
   end
 
+	###
+	
   @doc "Speak out words with a given volume, speed and voice"
   def speak(words, volume, speed, voice \\ "en") do
-    # case Ev3.platform() do
-    #   :ev3 ->
-    # :os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}" --stdout | aplay')
-    # :os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}"')
-    #   :brickpi ->
-    #     Logger.warn("Can't speak out: ${words}")
-    #   :dev ->
-    #     args =  ["-a", "#{volume}", "-s", "#{speed}", "-v", "#{voice}", words]
-    #     System.cmd("espeak", args)
-    # end
+    if mock?() do
+      args =  ["-a", "#{volume}", "-s", "#{speed}", "-v", "#{voice}", words]
+      System.cmd("espeak", args)
+    else
+			:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}" --stdout | aplay')
+			:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}"')
+    end
   end
 
   @doc "Speak words loud and clear"
   def speak(words) do
     speak(words, 300, 160)
   end
-    
 
   ### Private
 

@@ -3,7 +3,7 @@ defmodule Marvin.SmartThing.Communicators do
 
 	require Logger
 	alias Marvin.SmartThing.Device
-	alias Marvin.SmartThing
+	alias Marvin.SmartThing.PG2Communicator
 
 	@doc "Get all available communicator"
   def communicators() do
@@ -24,7 +24,7 @@ defmodule Marvin.SmartThing.Communicators do
 
   @doc "Execute a cound command"
   def execute_command(communicator, command, params) do
-    apply(SmartThing.Communicators, command, [communicator | params])
+    apply(__MODULE__, command, [communicator | params])
     communicator
   end
 
@@ -45,7 +45,7 @@ defmodule Marvin.SmartThing.Communicators do
 
 	defp module_for(type) do
 		case type do
-			:pg2 -> SmartThing.PG2Communicator
+			:pg2 -> PG2Communicator
 		  other ->
 				error = "Unknown type #{other} of communicator"
 				Logger.error(error)

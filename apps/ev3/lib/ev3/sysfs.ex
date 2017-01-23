@@ -1,11 +1,8 @@
 defmodule Marvin.Ev3.Sysfs do
 	@moduledoc "Interface to sysfs device files"
 
-  alias Ev3.{LegoMotors, LegoSensors}
-	alias Marvin.SmartThing.Device
   require Logger
   
-  @ports_path "/sys/class/lego-port"
 	@doc "Get the typed value of an attribute of the device"
   def get_attribute(device, attribute, type) do 
 		value = read_sys(device.path, attribute)

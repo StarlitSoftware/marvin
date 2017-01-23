@@ -6,7 +6,8 @@ defmodule Marvin.SmartThing.Mock.TouchSensor do
 	alias Marvin.SmartThing.Device
 	
 	def new() do
-		%Device{class: :sensor,
+		%Device{mod: Marvin.SmartThing.Mock,
+						class: :sensor,
 						path: "/mock/touch_sensor", 
 						type: :touch,
             mock: true}

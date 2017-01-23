@@ -1,31 +1,31 @@
 defmodule Marvin.SmartThing.Moving do
-	use Behaviour
 
+	alias Marvin.SmartThing.Device
+	
+	@callback reset(motor :: %Device{}) :: %Device{}
 
-	defcallback reset(motor :: %Ev3.Device{}) :: %Ev3.Device{}
-
-	defcallback set_speed(motor :: %Ev3.Device{}, mode :: atom, speed :: number) :: %Ev3.Device{}
+	@callback set_speed(motor :: %Device{}, mode :: atom, speed :: number) :: %Device{}
 		
-	defcallback reverse_polarity(motor :: %Ev3.Device{}) :: %Ev3.Device{} 
+	@callback reverse_polarity(motor :: %Device{}) :: %Device{} 
 
-	defcallback set_duty_cycle(motor :: %Ev3.Device{}, duty_cycle :: number) :: %Ev3.Device{}  
+	@callback set_duty_cycle(motor :: %Device{}, duty_cycle :: number) :: %Device{}  
 
-	defcallback run(motor :: %Ev3.Device{}) :: %Ev3.Device{}  
+	@callback run(motor :: %Device{}) :: %Device{}  
 
-	defcallback run_for(motor :: %Ev3.Device{}, duration :: number) :: %Ev3.Device{}  
+	@callback run_for(motor :: %Device{}, duration :: number) :: %Device{}  
 
-	defcallback run_to_absolute(motor :: %Ev3.Device{}, degrees :: number) :: %Ev3.Device{}  
+	@callback run_to_absolute(motor :: %Device{}, degrees :: number) :: %Device{}  
 
-	defcallback run_to_relative(motor :: %Ev3.Device{}, degrees :: number) :: %Ev3.Device{}  
+	@callback run_to_relative(motor :: %Device{}, degrees :: number) :: %Device{}  
 
-	defcallback coast(motor :: %Ev3.Device{}) :: %Ev3.Device{}  
+	@callback coast(motor :: %Device{}) :: %Device{}  
 
-	defcallback brake(motor :: %Ev3.Device{}) :: %Ev3.Device{}  
+	@callback brake(motor :: %Device{}) :: %Device{}  
 
-	defcallback hold(motor :: %Ev3.Device{}) :: %Ev3.Device{}
+	@callback hold(motor :: %Device{}) :: %Device{}
 
-  defcallback set_ramp_up(motor :: %Ev3.Device{}, msecs :: number) :: %Ev3.Device{}
+  @callback set_ramp_up(motor :: %Device{}, msecs :: number) :: %Device{}
 
-	defcallback set_ramp_down(motor :: %Ev3.Device{}, msecs :: number) :: %Ev3.Device{}
+	@callback set_ramp_down(motor :: %Device{}, msecs :: number) :: %Device{}
 
 end

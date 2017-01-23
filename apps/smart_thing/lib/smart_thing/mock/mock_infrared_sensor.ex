@@ -4,12 +4,14 @@ defmodule Marvin.SmartThing.Mock.InfraredSensor do
 	@behaviour Marvin.SmartThing.Sensing
   @max_beacon_channels 1 #4
 
+	alias Marvin.SmartThing.Device
+
 	def new() do
-		%Ev3.Device{Marvin.SmartThing.Mock,
-								class: :sensor,
-								path: "/mock/infrared_sensor", 
-								type: :infrared,
-								mock: true}
+		%Device{mod: Marvin.SmartThing.Mock,
+						class: :sensor,
+						path: "/mock/infrared_sensor", 
+						type: :infrared,
+						mock: true}
 	end
 
 	### Sensing

@@ -18,3 +18,5 @@ use Mix.Config
 config :ev3,
 beacon_channel: 2,
 voice: "en-sc"
+
+

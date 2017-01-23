@@ -1,7 +1,7 @@
 defmodule Panel.Mixfile do
   use Mix.Project
 
-  def project do
+  def project() do
     [app: :panel,
      version: "0.0.1",
      build_path: "../../_build",
@@ -13,13 +13,13 @@ defmodule Panel.Mixfile do
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application.
   #
   # Type `mix help compile.app` for more information.
-  def application do
+  def application() do
     [mod: {Panel, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext]]
   end
@@ -31,7 +31,7 @@ defmodule Panel.Mixfile do
   # Specifies your project dependencies.
   #
   # Type `mix help deps` for examples and options.
-  defp deps do
+  defp deps() do
     [{:phoenix, "~> 1.1.4"},
      {:phoenix_html, "~> 2.4"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},

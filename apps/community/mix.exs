@@ -1,7 +1,7 @@
 defmodule Community.Mixfile do
   use Mix.Project
 
-  def project do
+  def project() do
     [app: :community,
      version: "0.1.0",
      build_path: "../../_build",
@@ -17,7 +17,7 @@ defmodule Community.Mixfile do
   # Configuration for the OTP application
   #
   # Type "mix help compile.app" for more information
-  def application do
+  def application() do
     # Specify extra applications you'll use from Erlang/Elixir
     [extra_applications: [:logger],
      mod: {Community.Application, []}]
@@ -36,7 +36,7 @@ defmodule Community.Mixfile do
   #   {:my_app, in_umbrella: true}
   #
   # Type "mix help deps" for more examples and options
-  defp deps do
+  defp deps() do
     []
   end
 end

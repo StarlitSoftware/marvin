@@ -3,7 +3,7 @@ defmodule SmartThing.Mixfile do
 
   @target System.get_env("NERVES_TARGET") || "ev3"
 
-  def project do
+  def project() do
     [app: :smart_thing,
      version: "0.1.0",
        target: @target,
@@ -22,9 +22,9 @@ defmodule SmartThing.Mixfile do
   # Configuration for the OTP application
   #
   # Type "mix help compile.app" for more information
-  def application do
+  def application() do
     # Specify extra applications you'll use from Erlang/Elixir
-    [extra_applications: [:logger, :logger_file_backend, :nerves_interim_wifi, :ex_ncurses],
+    [extra_applications: [:logger, :logger_file_backend, :gen_stage, :nerves_interim_wifi, :ex_ncurses],
      mod: {Marvin.SmartThing.Application, []}
 		]
   end
@@ -42,21 +42,30 @@ defmodule SmartThing.Mixfile do
   #   {:my_app, in_umbrella: true}
   #
   # Type "mix help deps" for more examples and options
-  defp deps do
-    [{:nerves, "~> 0.4.0"},
-		 {:nerves_networking, github: "nerves-project/nerves_networking"},
+  defp deps() do
+    [{:gen_stage, "~> 0.10"},
+		 {:nerves, "~> 0.4.0"},
+#		 {:nerves_networking, github: "nerves-project/nerves_networking"},
      {:logger_file_backend, "~> 0.0.9"},
-     {:nerves_interim_wifi, "~> 0.1.0"},
-		 {:ex_ncurses, github: "fhunleth/ex_ncurses", branch: "bump_deps"},
-		 {:ev3, in_umbrella: true}
+#     {:nerves_interim_wifi, "~> 0.1.0"},
+		 {:ex_ncurses, github: "fhunleth/ex_ncurses", branch: "bump_deps"}
 		]
+  end
+
+  # Configuration for the OTP application
+  #
+  # Type "mix help compile.app" for more information
+  def application() do
+    # Specify extra applications you'll use from Erlang/Elixir
+    [extra_applications: [:logger],
+     mod: {Marvin.SmartThing.Application, []}]
   end
 
   def system(target) do
     [{:"nerves_system_#{target}", ">= 0.0.0"}]
   end
 
-  def aliases do
+  def aliases() do
     ["deps.precompile": ["nerves.precompile", "deps.precompile"],
      "deps.loadpaths":  ["deps.loadpaths", "nerves.loadpaths"]]
   end

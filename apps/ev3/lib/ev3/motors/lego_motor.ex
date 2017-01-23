@@ -2,9 +2,9 @@ defmodule Marvin.Ev3.LegoMotor do
 	@moduledoc "Lego motors access"
 
   alias Marvin.SmartThing.Device
-	alias Marvin.Ev3
-	alias Marvin.SmartThing.Mock
+		alias Marvin.SmartThing.Mock
 	import Marvin.Ev3.Sysfs
+	import Marvin.SmartThing.Utils, only: [mock?: 0]
 	require Logger
 
 	@sys_path "/sys/class/tacho-motor"
@@ -18,20 +18,19 @@ defmodule Marvin.Ev3.LegoMotor do
 
 	@doc "Generates a list of all plugged in motor devices"
 	def motors() do
-		case Ev3.platform() do
-      :ev3 ->
-	 		files = case File.ls(@sys_path) do
-								{:ok, files} -> files
-								{:error, reason} ->
-									Logger.warn("Failed getting motor files: #{inspect reason}")
-									[]
-							end
+		if mock?() do
+			[Mock.Tachomotor.new(:large, "outA"),
+			 Mock.Tachomotor.new(:large, "outB"),
+			 Mock.Tachomotor.new(:medium, "outC")]
+		else
+	 		case File.ls(@sys_path) do
+				{:ok, files} -> files
+				{:error, reason} ->
+					Logger.warn("Failed getting motor files: #{inspect reason}")
+					[]
+			end
 			|> Enum.filter(&(String.starts_with?(&1, @prefix)))
 			|> Enum.map(&(init_motor("#{@sys_path}/#{&1}")))
-		  :dev ->
-			  [Mock.Tachomotor.new(:large, "outA"),
-			   Mock.Tachomotor.new(:large, "outB"),
-			   Mock.Tachomotor.new(:medium, "outC")]
 		end
   end
 

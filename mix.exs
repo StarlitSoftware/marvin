@@ -1,7 +1,7 @@
 defmodule Marvin.Mixfile do
   use Mix.Project
 
-  def project do
+  def project() do
     [apps_path: "apps",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -20,12 +20,12 @@ defmodule Marvin.Mixfile do
   #
   # Dependencies listed here are available only for this project
   # and cannot be accessed from applications inside the apps folder
-  defp deps do
-    [{:gen_stage, "~> 0.10"}]
+  defp deps() do
+    []
   end
 
-	def application do
-		[applications: [:gen_stage]]
+	def application() do
+		[]
 	end
 	
 end
