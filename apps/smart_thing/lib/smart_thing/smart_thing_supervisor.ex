@@ -3,6 +3,7 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	use Supervisor
 	require Logger
 	alias Marvin.SmartThing.{CNS, PFCortex, Memory, PerceptorsSupervisor, Perception, MotivatorsSupervisor, BehaviorsSupervisor, ActuatorsSupervisor, Motivation, Behaviors, Actuation, InternalClock, PG2Communicator}
+	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
 
 	@name __MODULE__
 
@@ -36,7 +37,6 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	def start_perception() do
 		Logger.info("Starting perception")
 		start_perceptors()
-		start_detectors()
 	end
 
 	@doc "Start the robot's execution"
@@ -52,12 +52,6 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	defp start_perceptors() do
 		Perception.perceptor_configs()
 		|> Enum.each(&(PerceptorsSupervisor.start_perceptor(&1)))
-	end
-
-	defp start_detectors() do
-		sensing_devices = dispatch_platform(:sensors) ++ dispatch_platform(:motors)
-    used_senses = all_used_senses()
-		Enum.each(sensing_devices, &(DetectorsSupervisor.start_detector(&1, used_senses)))		
 	end
 
   defp start_motivators() do

@@ -32,9 +32,13 @@ defmodule Marvin.SmartThing.Utils do
 	end
 	
 	def platform_dispatch(fn_name, args) do
-		apply(platform(), args)
+		apply(platform(), fn_name, args)
 	end
 
+	def get_voice() do
+		platform_dispatch(:voice)
+	end
+	
 	def platform() do
 		Application.get_env(:smart_thing, :platform)
 	end

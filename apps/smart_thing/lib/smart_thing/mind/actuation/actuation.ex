@@ -163,76 +163,44 @@ defmodule Marvin.SmartThing.Actuation do
 	end
 
 	# light
-
-  defp blue_lights() do
-    if Marvin.SmartThing.platform != :brickpi do
-      Logger.warn("Blue LEDs only on BrickPi. Using green instead.")
-      green_lights()
-    else
-      fn(intent, leds) ->
-        value = case intent.value do
-                  :on -> 255
-                  :off -> 0
-                end
-			  Script.new(:blue_lights, leds)
-			  |> Script.add_step(:lb, :set_brightness, [value])
-			  |> Script.add_step(:rb, :set_brightness, [value])
-      end
-    end
-  end
   
 	defp green_lights() do
-    if Marvin.SmartThing.platform == :brickpi do
-      Logger.warn("No green LEDs on BrickPi. Using blue instead.")
-      blue_lights()
-    else
-		  fn(intent, leds) ->
-			  value = case intent.value do
-								  :on -> 255
-								  :off -> 0
-							  end
-			  Script.new(:green_lights, leds)
-			  |> Script.add_step(:lr, :set_brightness, [0])
-			  |> Script.add_step(:rr, :set_brightness, [0])
-			  |> Script.add_step(:lg, :set_brightness, [value])
-			  |> Script.add_step(:rg, :set_brightness, [value])
-		  end
+		fn(intent, leds) ->
+			value = case intent.value do
+								:on -> 255
+								:off -> 0
+							end
+			Script.new(:green_lights, leds)
+			|> Script.add_step(:lr, :set_brightness, [0])
+			|> Script.add_step(:rr, :set_brightness, [0])
+			|> Script.add_step(:lg, :set_brightness, [value])
+			|> Script.add_step(:rg, :set_brightness, [value])
     end
 	end
 	
 	defp red_lights() do
-    if Marvin.SmartThing.platform == :brickpi do
-      Logger.warn("No red LEDs on BrickPi. Using blue instead.")
-      blue_lights()
-    else
-		  fn(intent, leds) ->
-			  value = case intent.value do
-								  :on -> 255
-								  :off -> 0
-							  end
-			  Script.new(:red_lights, leds)
-			  |> Script.add_step(:lg, :set_brightness, [0])
-			  |> Script.add_step(:rg, :set_brightness, [0])
-			  |> Script.add_step(:lr, :set_brightness, [value])
-			  |> Script.add_step(:rr, :set_brightness, [value])
-		  end
-    end
+		fn(intent, leds) ->
+			value = case intent.value do
+								:on -> 255
+								:off -> 0
+							end
+			Script.new(:red_lights, leds)
+			|> Script.add_step(:lg, :set_brightness, [0])
+			|> Script.add_step(:rg, :set_brightness, [0])
+			|> Script.add_step(:lr, :set_brightness, [value])
+			|> Script.add_step(:rr, :set_brightness, [value])
+		end
 	end
 	
 	defp orange_lights() do
-    if Marvin.SmartThing.platform == :brickpi do
-      Logger.warn("No orange (green + red) LEDs on BrickPi. Using blue instead.")
-      blue_lights()
-    else
-		  fn(intent, leds) ->
-			  value = case intent.value do
-								  :on -> 255
-								  :off -> 0
-							  end
-			  Script.new(:orange_lights, leds)
-			  |> Script.add_step(:all, :set_brightness, [value])
-		  end
-    end
+		fn(intent, leds) ->
+			value = case intent.value do
+								:on -> 255
+								:off -> 0
+							end
+			Script.new(:orange_lights, leds)
+			|> Script.add_step(:all, :set_brightness, [value])
+		end
 	end
 
 	# Sounds

@@ -15,8 +15,8 @@ defmodule Marvin.SmartThing.ActuatorConfig do
 	defp intent_names(activations) do
 		set = Enum.reduce(
 			activations,
-			HashSet.new(),
-			fn(activation, acc) -> HashSet.put(acc, activation.intent) end
+			MapSet.new(),
+			fn(activation, acc) -> MapSet.put(acc, activation.intent) end
 		)
 		Enum.to_list(set)
 	end

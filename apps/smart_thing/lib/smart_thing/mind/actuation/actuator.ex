@@ -2,7 +2,8 @@ defmodule Marvin.SmartThing.Actuator do
 	@moduledoc "An actuator that translates intents into commands sent to motors"
 
 	require Logger
-	alias Marvin.SmartThing.{LegoMotor, Script, Device, MotorSpec, LEDSpec, SoundSpec, CommSpec, Communication, CNS, Intent}
+	alias Marvin.SmartThing.{Script, Device, MotorSpec, LEDSpec, SoundSpec, CommSpec, Communicators, CNS, Intent}
+	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
 
 	@max_intent_age 2000 # 2000 # intents older than 1 sec are stale 
   @strong_intent_factor 2 # strong intents last longer before becoming stale
@@ -121,7 +122,7 @@ defmodule Marvin.SmartThing.Actuator do
   end
 
 	defp find_communicators(comm_specs) do
-		all_communicators = Communication.communicators()		
+		all_communicators = Communicators.communicators()		
 		found = Enum.reduce(
       comm_specs,
       %{},

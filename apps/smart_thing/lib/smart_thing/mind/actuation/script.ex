@@ -2,6 +2,8 @@ defmodule Marvin.SmartThing.Script do
 	@moduledoc "Activation script"
 
 	require Logger
+	alias Marvin.SmartThing.Communicators
+	import Marvin.SmartThing.Utils, only: [platform_dispatch: 2]
 
 	defstruct name: nil, steps: [], devices: nil
 	
@@ -69,11 +71,11 @@ defmodule Marvin.SmartThing.Script do
 			all_devices,
 			fn(device, acc) ->
 				updated_device =
-					case actuator_type when in [:comm, :motor, :led, :sound] do
+					case actuator_type  do
 						:comm ->
-							Communication.execute_command(device, command, params)
-						_ ->
-							module = platform_dispatch(:device_manager, [actuator_type])
+							Communicators.execute_command(device, command, params)
+						type when type in [:comm, :motor, :led, :sound] ->
+							module = platform_dispatch(:device_manager, [type])
 							apply(module, :execute_command, [device, command, params])
 					end
 				Map.put(acc, device_name, updated_device)

@@ -55,7 +55,7 @@ defmodule Marvin.SmartThing.Motive do
 
 	@doc "The age of the motive"
   def age(motive) do
-    fudge(now() - motive.since)
+    now() - motive.since
   end
 
   # A "memorable" - must have about, since and value fields

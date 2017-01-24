@@ -1,10 +1,10 @@
 defmodule Marvin.Ev3.Platform do
 
-	@behaviour Marvin.Smarthing.PlatformBehaviour
+	@behaviour Marvin.SmartThing.PlatformBehaviour
 
 	@moduledoc "Module implementing smart thing platform_dispatch calls"
 
-	alias Marvin.Ev3.{LegoSensors, LegoMotors, LegoSound, LegoLED}
+	alias Marvin.Ev3.{LegoSensor, LegoMotor, LegoSound, LegoLED}
 	
 	### PlatformBehaviour
 	
@@ -50,8 +50,8 @@ defmodule Marvin.Ev3.Platform do
 
 	def device_manager(type) do
 		case type do
-			:motor -> LegoMotors
-			:sensor -> LegoSensors
+			:motor -> LegoMotor
+			:sensor -> LegoSensor
 			:led -> LegoLED
 			:sound -> LegoSound
 		end
@@ -62,7 +62,7 @@ defmodule Marvin.Ev3.Platform do
 	end
 
 	def motors() do
-		LegoMotors.motors()
+		LegoMotor.motors()
 	end
 
 	def sound_players() do
@@ -70,7 +70,7 @@ defmodule Marvin.Ev3.Platform do
 	end
 
 	def lights() do
-		LegoLED().leds()
+		LegoLED.leds()
 	end
 
 	def shutdown() do
@@ -80,6 +80,10 @@ defmodule Marvin.Ev3.Platform do
 	def thing_channel() do
 		Application.get_env(:ev3, :beacon_channel, 0)
 	end
+
+	def get_voice() do
+		Application.get_env(:ev3, :voice, "en-us")
+	end 
 
 	###
 

@@ -48,7 +48,7 @@ defmodule Marvin.SmartThing.Percept do
 
   @doc "The age of the percept"
   def age(percept) do
-    fudge(now() - percept.until)
+    percept.until
   end
 
 	@doc "The sense of the percept"

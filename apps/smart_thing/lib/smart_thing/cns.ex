@@ -2,7 +2,7 @@ defmodule Marvin.SmartThing.CNS do
 	@moduledoc "A resilient event manager that acts as the smart thing's central nervous system"
 
   alias Marvin.SmartThing.{PerceptorsHandler, PFCortexHandler, MemoryHandler,InternalClockHandler,
-													 ActuatorsHandler, BehaviorsHandler, MotivatorsHandler, ChannelsHandler,
+													 ActuatorsHandler, BehaviorsHandler, MotivatorsHandler,
 													 Percept, Motive, Intent}
 	require Logger
 	use GenServer

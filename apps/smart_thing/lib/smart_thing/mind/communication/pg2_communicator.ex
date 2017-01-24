@@ -6,7 +6,7 @@ defmodule Marvin.SmartThing.PG2Communicator do
 	use GenServer
 	alias Marvin.SmartThing.Percept
 	alias Marvin.SmartThing.CNS
-	import Marvin.Ev3.Utils
+	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
 	require Logger
 
 	@name __MODULE__
@@ -37,17 +37,17 @@ defmodule Marvin.SmartThing.PG2Communicator do
 
 	def handle_cast({:communicate, device, info, team}, state =  %{group: group}) do
 		members = :pg2.get_members(group)
-    thing_channel = dispatch_platform(:thing_channel)
+    thing_channel = platform_dispatch(:thing_channel)
 		members
 		|> Enum.each(&(GenServer.cast(&1, {:communication, Node.self(), info, team, thing_channel, device.props.ttl})))
 		Logger.info("COMMUNICATOR  #{inspect Node.self()} communicated #{inspect info} to team #{team} in #{inspect members}")
 		{:noreply, state}
 	end
 
-	def handle_cast({:communication, node, info, team, thing_channel, _ttl}, state) do # ttl for what's communicated
+	def handle_cast({:communication, node, info, team, thing_channel, ttl}, state) do # ttl for what's communicated
 		if node != Node.self() do
 			Logger.info("COMMUNICATOR #{inspect Node.self()} heard #{inspect info} for team #{team} from #{inspect node}")
-			_percept = Percept.new(about: :heard, value: %{robot: node, team: team, info: info, thing_channel: thing_channel})
+			percept = Percept.new(about: :heard, value: %{robot: node, team: team, info: info, thing_channel: thing_channel})
 			CNS.notify_perceived(%{percept |
 														 ttl: ttl,
 														 source: @name})

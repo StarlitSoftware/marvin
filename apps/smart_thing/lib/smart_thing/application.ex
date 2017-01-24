@@ -3,8 +3,8 @@ defmodule Marvin.SmartThing.Application do
 	
   use Application
   require Logger
-	alias Marvin.SmartThing.{SmartThingSupervisor, CNS, Display}
-	import Marvin.SMartThin.Utils, only: [platform_dispatch: 2]
+	alias Marvin.SmartThing.{SmartThingSupervisor, CNS}
+	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
 
   @poll_runtime_delay 5000
 

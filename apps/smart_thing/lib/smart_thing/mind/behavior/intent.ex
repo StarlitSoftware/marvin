@@ -31,7 +31,7 @@ defmodule Marvin.SmartThing.Intent do
 
   @doc "The age of an intent"
   def age(intent) do
-    fudge(now() - intent.since)
+    now() - intent.since
   end
 
   @doc "Describe the strength of an intent"

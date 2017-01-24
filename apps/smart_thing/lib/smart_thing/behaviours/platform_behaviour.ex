@@ -1,4 +1,4 @@
-fdefmodule Marvin.SmartThing. PlatformBehaviour do
+defmodule Marvin.SmartThing.PlatformBehaviour do
 
 	@doc "Translates a generic device type to the platform's device type"
 	@callback mode(device_type :: atom) :: binary
@@ -33,5 +33,7 @@ fdefmodule Marvin.SmartThing. PlatformBehaviour do
 	@doc "Returns the platform's devce manager for the given type"
 	@callback device_manager(type :: atom) :: any
 
-
+  @doc "Get the voice to be used to speak"
+	@callback get_voice() :: binary
+	
 end

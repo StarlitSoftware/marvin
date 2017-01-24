@@ -120,7 +120,7 @@ defmodule Marvin.SmartThing.Perception do
 				Logger.info("!!!! FOOD a little !!!!")
 				Percept.new(about: :food, value: :little)
 			end
-				(%Percept{about: :color, value: color}, _memories) ->
+				(%Percept{about: :color, value: _color}, _memories) ->
 				Percept.new(about: :food, value: :none)
 			(_, _) ->
 				nil
