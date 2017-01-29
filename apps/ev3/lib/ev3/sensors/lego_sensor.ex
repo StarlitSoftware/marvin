@@ -14,23 +14,15 @@ defmodule Marvin.Ev3.LegoSensor do
 
 	@doc "Get the currently connected lego sensors"
   def sensors() do
-		if !Marvin.SmartThing.testing?() do
-	 		files = case File.ls(@sys_path) do
-								{:ok, files} -> files
-								{:error, reason} ->
-									Logger.warn("Failed getting sensor files: #{inspect reason}")
-									[]
-							end
-			files
-			|> Enum.filter(&(String.starts_with?(&1, @prefix)))
-			|> Enum.map(&(init_sensor("#{@sys_path}/#{&1}")))
-		else
-			[Mock.TouchSensor.new(),
-       Mock.ColorSensor.new(),
-       Mock.InfraredSensor.new(),
-       Mock.UltrasonicSensor.new(),
-       Mock.GyroSensor.new()]
-		end
+	 	files = case File.ls(@sys_path) do
+							{:ok, files} -> files
+							{:error, reason} ->
+								Logger.warn("Failed getting sensor files: #{inspect reason}")
+								[]
+						end
+		files
+		|> Enum.filter(&(String.starts_with?(&1, @prefix)))
+		|> Enum.map(&(init_sensor("#{@sys_path}/#{&1}")))
   end
 
   @doc "Is this type of device a sensor?"
@@ -53,11 +45,6 @@ defmodule Marvin.Ev3.LegoSensor do
 				Logger.warn("#{inspect error} when reading #{inspect sense} from #{inspect sensor}")
 				{nil, sensor}
 		end
-	end
-
-	@doc "Nudge the value of a sense from a mock sensor"
-	def nudge(%Device{mock: true} = sensor, sense, value, previous_value) do 
-	    apply(module_for(sensor), :nudge, [sensor, sense, value, previous_value])
 	end
 
 	@doc "Get how long to pause between reading a sense from a sensor. In msecs"

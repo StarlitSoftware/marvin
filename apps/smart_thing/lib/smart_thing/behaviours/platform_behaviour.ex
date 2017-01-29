@@ -35,5 +35,16 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 
   @doc "Get the voice to be used to speak"
 	@callback get_voice() :: binary
+
+	@doc "Read a sensor's sense"
+	@callback sensor_read_sense(device, sense)
+
+	@doc "Get a sensor's sensitivity for a sense"
+	@callback sensor_sensitivity(device, sense)
 	
+	@doc "Read a motor's sense"
+	@callback motor_read_sense(device, sense)
+
+	@doc "Get a motor's sensitivity for a sense"
+	@callback motor_sensitivity(device, sense)
 end

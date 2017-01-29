@@ -83,7 +83,23 @@ defmodule Marvin.Ev3.Platform do
 
 	def get_voice() do
 		Application.get_env(:ev3, :voice, "en-us")
-	end 
+	end
+
+	def sensor_read_sense(device, sense) do
+		LegoSensor.read(device, sense)
+	end
+
+	def motor_read_sense(device, sense) do
+		LegoMotor.read(device, sense)
+	end
+
+	def sensor_sensitivity(device, sense) do
+		LegoSensor.sensitivity(device, sense)
+	end
+	
+	def motor_sensitivity(device, sense) do
+		LegoMotor.sensitivity(device, sense)
+	end
 
 	###
 

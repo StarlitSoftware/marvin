@@ -17,7 +17,11 @@ defmodule Marvin.SmartThing.Device do
 	end
 	
   def device_code(%Marvin.SmartThing.Device{mod: mod, type: type}) do
-		apply(mod, :devide_code, [type])
+		apply(mod, :device_code, [type])
+	end
+
+	def name(%Marvin.SmartThing.Device{path: path}) do
+		path
 	end
 	
 end

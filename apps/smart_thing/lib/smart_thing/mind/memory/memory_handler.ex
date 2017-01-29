@@ -31,6 +31,17 @@ defmodule Marvin.SmartThing.MemoryHandler do
 		{:ok, state}
 	end
 
+	def handle_event({:behavior_stopped, name, reflex?}, state) do
+		if not reflex?, do: Memory.store_behavior_stopped(name)
+		{:ok, state}
+	end
+
+	def handle_event({:behavior_transited, behavior_name, to_state_name}, state) do
+		Memory.store_behavior_transited(behavior_name, to_state_name)
+		{:ok, state}
+	end
+
+
 	def handle_event(_event, state) do
 #		Logger.debug("#{__MODULE__} ignored #{inspect event}")
 		{:ok, state}

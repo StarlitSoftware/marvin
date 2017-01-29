@@ -1,7 +1,7 @@
 defmodule Marvin.SmartThing.CNS do
 	@moduledoc "A resilient event manager that acts as the smart thing's central nervous system"
 
-  alias Marvin.SmartThing.{PerceptorsHandler, PFCortexHandler, MemoryHandler,InternalClockHandler,
+  alias Marvin.SmartThing.{PerceptorsHandler, AttentionHandler, MemoryHandler,InternalClockHandler,
 													 ActuatorsHandler, BehaviorsHandler, MotivatorsHandler,
 													 Percept, Motive, Intent}
 	require Logger
@@ -255,7 +255,7 @@ defmodule Marvin.SmartThing.CNS do
 	defp register_handlers() do
 		# Add monitored handlers. Any crash will cause a message to be sent to the CNS.
 		:ok = GenEvent.add_mon_handler(@dispatcher, MemoryHandler, [])
-		:ok = GenEvent.add_mon_handler(@dispatcher, PFCortexHandler, [])
+		:ok = GenEvent.add_mon_handler(@dispatcher, AttentionHandler, [])
     :ok = GenEvent.add_mon_handler(@dispatcher, InternalClockHandler, [])
 		:ok = GenEvent.add_mon_handler(@dispatcher, ActuatorsHandler, [])
 		:ok = GenEvent.add_mon_handler(@dispatcher, BehaviorsHandler, [])

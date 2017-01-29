@@ -24,6 +24,14 @@ defmodule Marvin.SmartThing.Memory do
 		GenServer.cast(@name, {:store, something})
 	end
 
+	def store_behavior_stopped(behavior_name) do
+		GenServer.cast(@name, {:store_behavior_stopped, behavior_name})
+	end
+
+	def store_behavior_transited(behavior_name, to_state_name) do
+		GenServer.cast(@name, {:store_behavior_transited, behavior_name, to_state_name})
+	end
+
 	@doc "Return percepts memorized since window_width as %{percepts: [...], motives: [...], intents: [...]}"
 	def since(window_width, senses: senses, motives: motive_names, intents: intent_names) do
 		GenServer.call(@name, {:since, window_width, senses, motive_names, intent_names})
@@ -54,12 +62,22 @@ defmodule Marvin.SmartThing.Memory do
 		GenServer.call(@name, {:recall_intents, name, window_width})
 	end
 
+	@doc "Get all currently on motives"
+	def on_motives() do
+		GenServer.call(@name, :on_motives)
+	end
+
+	@doc "Get the names of all active, non-inhibited behaviors"
+	def transited_behavior_names() do
+		GenServer.call(@name, :transited_behavior_names)
+	end
+
 	### CALLBACKS
 
 	def init(_) do
     pid = spawn_link(fn() -> forget()	end)
 		Process.register(pid, :forgetting)
-		{:ok, %{percepts: %{}, motives: %{}, intents: %{}}}
+		{:ok, %{percepts: %{}, motives: %{}, intents: %{}, behaviors: %{}}}
 	end
 
 	# forget all expired percepts every second
@@ -99,6 +117,16 @@ defmodule Marvin.SmartThing.Memory do
 		{:noreply, new_state}
 	end
 
+	def handle_cast({:store_behavior_stopped, behavior_name}, %{behaviors: behaviors} = state) do
+		new_state = %{state | behaviors: behavior_stopped(behaviors, behavior_name)}
+		{:noreply, new_state}
+	end
+
+	def handle_cast({:store_behavior_transited, behavior_name, to_state_name}, %{behaviors: behaviors} = state) do
+		new_state = %{state | behaviors: behavior_transited(behaviors, behavior_name, to_state_name)}
+		{:noreply, new_state}
+	end
+
 	def handle_call({:recall_percepts, senses, window_width}, _from, state) do
 		percepts = recent_percepts(window_width, senses, state)
 		{:reply, percepts, state}
@@ -132,6 +160,14 @@ defmodule Marvin.SmartThing.Memory do
 		{:reply, intents, state}
 	end
 
+	def handle_call(:on_motives, _from, %{motives: motives} = state) do
+		Enum.filter(motives, &(Motive.on?(&1)))
+	end
+
+	def handle_call(:transited_behavior_names, _from, %{behaviors: behaviors} = state) do
+		behavior_names = Map.keys(behaviors)
+	end
+
 	### PRIVATE
 
 	defp update_percepts(percept, []) do
@@ -163,7 +199,6 @@ defmodule Marvin.SmartThing.Memory do
 			[current|rest]
 		end
 	end
-
 
 	defp update_intents(intent, []) do
 		CNS.notify_memorized(:new, intent)
@@ -334,4 +369,12 @@ defmodule Marvin.SmartThing.Memory do
 		)
 	end
 	
+	defp behavior_transited(behaviors, behavior_name, to_state_name) do
+		Map.put(behaviors, behavior_name, to_state_name)
+	end
+
+	defp behavior_stopped(behaviors, behavior_name) do
+		Map.delete(behaviors, behavior_name)
+	end
+
 end

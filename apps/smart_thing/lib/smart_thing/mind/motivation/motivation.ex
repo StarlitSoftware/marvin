@@ -49,7 +49,6 @@ defmodule Marvin.SmartThing.Motivation do
     |> MapSet.to_list()
   end
 
-
 	@doc "Curiosity motivation"
 	def curiosity() do
 		fn

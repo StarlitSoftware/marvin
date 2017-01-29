@@ -44,7 +44,10 @@ defmodule Marvin.SmartThing.Behavior do
 			fn(state) ->
         if check_freshness(name, percept) do
 				  case transit_on(percept, state) do
-					  %{reflex: reflex, fsm_state: final_state, fsm: %FSM{final_state: final_state}} = end_state when not reflex ->
+					  %{reflex: reflex,
+							fsm_state: final_state,
+							fsm: %FSM{final_state: final_state}
+						 } = end_state when not reflex ->
 						  final_transit(end_state)
 					  new_state ->
 						  new_state

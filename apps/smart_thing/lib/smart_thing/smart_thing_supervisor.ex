@@ -2,7 +2,8 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 
 	use Supervisor
 	require Logger
-	alias Marvin.SmartThing.{CNS, PFCortex, Memory, PerceptorsSupervisor, Perception, MotivatorsSupervisor, BehaviorsSupervisor, ActuatorsSupervisor, Motivation, Behaviors, Actuation, InternalClock, PG2Communicator}
+	alias Marvin.SmartThing
+	alias Marvin.SmartThing.{CNS, Attention, Memory, DetectorsSupervisor, PerceptorsSupervisor, Perception, MotivatorsSupervisor, BehaviorsSupervisor, ActuatorsSupervisor, Motivation, Behaviors, Actuation, InternalClock, PG2Communicator}
 	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
 
 	@name __MODULE__
@@ -21,9 +22,10 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 		children = [	
 		 	worker(CNS, []),
 		 	worker(Memory, []),
-			worker(PFCortex, []),
+			worker(Attention, []),
 			worker(InternalClock, []),
 		 	worker(PG2Communicator, []),
+			supervisor(DetectosSupervisor, []),
 		 	supervisor(ActuatorsSupervisor, []),
 		 	supervisor(BehaviorsSupervisor, []),
 		 	supervisor(MotivatorsSupervisor, []),
@@ -37,6 +39,7 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	def start_perception() do
 		Logger.info("Starting perception")
 		start_perceptors()
+		start_detectors()
 	end
 
 	@doc "Start the robot's execution"
@@ -48,6 +51,11 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	end
 
 	### Private
+
+	defp start_detectors() do
+		sensing_devices = SmartThing.sensors() ++ SmartThing.motors()
+		Enum.each(sensing_devices, &(DetectorsSupervisor.start_detector(&1)))		
+	end
 	
 	defp start_perceptors() do
 		Perception.perceptor_configs()
@@ -68,12 +76,6 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 		Actuation.actuator_configs()
 		|> Enum.each(&(ActuatorsSupervisor.start_actuator(&1)))
 	end
-
-  defp all_used_senses() do
-    MapSet.new(
-      Perception.used_senses() ++ Motivation.used_senses() ++ Behaviors.used_senses())
-    |> MapSet.to_list()
-  end
   
 end
 	
