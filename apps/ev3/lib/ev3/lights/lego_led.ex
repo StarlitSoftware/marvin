@@ -5,9 +5,7 @@ defmodule Marvin.Ev3.LegoLED do
 	
 	require Logger
 	import Marvin.Ev3.Sysfs
-	import Marvin.SmartThing.Utils, only: [mock?: 0]
 	alias Marvin.SmartThing.Device
-	alias Marvin.SmartThing.Mock
 	require Logger
 	
 	@sys_path "/sys/class/leds"
@@ -17,20 +15,10 @@ defmodule Marvin.Ev3.LegoLED do
 
 	@doc "Get the available LEDs"
 	def leds() do
-    if mock?() do
-			[Mock.LED.new(:green, :left),
-			 Mock.LED.new(:green, :right),
-			 Mock.LED.new(:red, :left),
-			 Mock.LED.new(:red, :right),
-			 Mock.LED.new(:blue, :left),
-			 Mock.LED.new(:blue, :right)]
-		else
-	 		File.ls!(@sys_path)
-			|> Enum.filter(&(String.starts_with?(&1, @ev3_prefix)))
-			|> Enum.map(&(init_ev3_led("#{&1}", "#{@sys_path}/#{&1}")))
-		end
+	 	File.ls!(@sys_path)
+		|> Enum.filter(&(String.starts_with?(&1, @ev3_prefix)))
+		|> Enum.map(&(init_ev3_led("#{&1}", "#{@sys_path}/#{&1}")))
   end
-
 
   @doc "Find a led device by position and color, or nil"
 	def led(position: position, color: color) do
@@ -77,17 +65,17 @@ defmodule Marvin.Ev3.LegoLED do
 
 	### PRIVATE
 
-	defp module_for(_led) do
-		if !Marvin.SmartThing.testing?() do
-			Ev3.LegoLED
-		else
-			Ev3.Mock.LED
-		end
+	defp module_for(led) do
+		module_for_type(led.type)
+	end
+
+	defp module_for_type(_type) do
+		Ev3.LegoLED
 	end
 
 	defp init_ev3_led(dir_name, path) do
 		[_, type] = Regex.run(@ev3_name_regex, dir_name)
-		led = %Device{mod: Marvin.Ev3,
+		led = %Device{mod: module_for_type(type),
 									class: :led,
 									path: path,
 									port: nil,

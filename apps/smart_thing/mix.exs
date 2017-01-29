@@ -8,8 +8,10 @@ defmodule SmartThing.Mixfile do
      version: "0.1.0",
        target: @target,
      archives: [nerves_bootstrap: "~> 0.2.1"],     
-     deps_path: "../../deps/#{@target}",
-     build_path: "../../_build/#{@target}",
+     # deps_path: "../../deps/#{@target}",
+     # build_path: "../../_build/#{@target}",
+     deps_path: "../../deps",
+     build_path: "../../_build",
      config_path: "../../config/config.exs",
      lockfile: "../../mix.lock",
      elixir: "~> 1.4",
@@ -24,7 +26,11 @@ defmodule SmartThing.Mixfile do
   # Type "mix help compile.app" for more information
   def application() do
     # Specify extra applications you'll use from Erlang/Elixir
-    [extra_applications: [:logger, :logger_file_backend, :gen_stage, :nerves_interim_wifi, :ex_ncurses],
+    [extra_applications: [:logger,
+													:logger_file_backend
+													#:nerves_interim_wifi,
+													#:ex_ncurses
+												 ],
      mod: {Marvin.SmartThing.Application, []}
 		]
   end
@@ -43,12 +49,11 @@ defmodule SmartThing.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps() do
-    [{:gen_stage, "~> 0.10"},
-		 {:nerves, "~> 0.4.0"},
+    [
+#			{:nerves, "~> 0.4.0"},
 #		 {:nerves_networking, github: "nerves-project/nerves_networking"},
-     {:logger_file_backend, "~> 0.0.9"},
 #     {:nerves_interim_wifi, "~> 0.1.0"},
-		 {:ex_ncurses, github: "fhunleth/ex_ncurses", branch: "bump_deps"}
+#		 {:ex_ncurses, github: "fhunleth/ex_ncurses", branch: "bump_deps"}
 		]
   end
 

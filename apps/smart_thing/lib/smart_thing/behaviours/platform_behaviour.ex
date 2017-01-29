@@ -34,7 +34,7 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 	@callback device_manager(type :: atom) :: any
 
   @doc "Get the voice to be used to speak"
-	@callback get_voice() :: binary
+	@callback voice() :: binary
 
 	@doc "Read a sensor's sense"
 	@callback sensor_read_sense(devce :: %Marvin.SmartThing.Device{}, sense :: any) :: any

@@ -11,16 +11,14 @@ defmodule Marvin.SmartThing.Application do
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
+		Logger.info("Starting #{__MODULE__}")
 #    initialize_nerves() # TODO
 		connect_to_nodes() # Create P2P cluster
     import Supervisor.Spec, warn: false
     children = [
-			supervisor(SmartThingSupervisor, []),
-			worker(display(), [])
+			supervisor(SmartThingSupervisor, [])
+#			worker(display(), [])
     ]
-
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: :root_supervisor]
     result = Supervisor.start_link(children, opts)
 		SmartThingSupervisor.start_execution()
@@ -50,12 +48,12 @@ defmodule Marvin.SmartThing.Application do
 		CNS.notify_shutdown()
 	end
 
-  def ipaddr() do
-    case Nerves.NetworkInterface.settings("wlan0") do
-      {:ok, settings} -> settings.ipv4_address
-      _ -> "Unknown"
-    end
-  end
+  # def ipaddr() do
+  #   case Nerves.NetworkInterface.settings("wlan0") do
+  #     {:ok, settings} -> settings.ipv4_address
+  #     _ -> "Unknown"
+  #   end
+  # end
 
 	def display() do
 		Application.get_env(:smart_thing, :display)
@@ -76,7 +74,7 @@ defmodule Marvin.SmartThing.Application do
 
   defp mem_stats() do
     {res, 0} = System.cmd("free", ["-m"])
-    [_labels, mem, _buffers, swap, _] = String.split(res, "\n")
+    [_labels, mem, swap, _buffers] = String.split(res, "\n")
     [_, _mem_total, mem_used, mem_free, _, _, _] = String.split(mem) 
 	  [_, _swap_total, swap_used, swap_free] = String.split(swap)
     %{mem_free: to_int!(mem_free),
@@ -92,76 +90,76 @@ defmodule Marvin.SmartThing.Application do
 
  ### NERVES
 
-	defp initialize_nerves() do
-   load_nerves_os_modules()
-   start_writable_fs()
-   start_wifi()
-	end
+	# defp initialize_nerves() do
+  #  load_nerves_os_modules()
+  #  start_writable_fs()
+  #  start_wifi()
+	# end
 
-	defp load_nerves_os_modules() do
-		platform_dispatch(:load_nerves_os_modules)
-	end
+	# defp load_nerves_os_modules() do
+	# 	platform_dispatch(:load_nerves_os_modules)
+	# end
 
-  defp start_wifi() do
-    opts = Application.get_env(:ev3, :wlan0)
-    Nerves.InterimWiFi.setup "wlan0", opts
-		wait_for_ip_address()
-  end
+  # defp start_wifi() do
+  #   opts = Application.get_env(:ev3, :wlan0)
+  #   Nerves.InterimWiFi.setup "wlan0", opts
+	# 	wait_for_ip_address()
+  # end
 
-	defp wait_for_ip_address() do
-		case Ev3.ipaddr() do
-			"Unknown" ->
-				Logger.warn("Waiting for ip address...")
-				Process.sleep(500)
-				wait_for_ip_address()
-			ip ->
-				Logger.warn("Got ip address #{inspect ip}")
-				:ok
-		end
-	end
+	# defp wait_for_ip_address() do
+	# 	case Ev3.ipaddr() do
+	# 		"Unknown" ->
+	# 			Logger.warn("Waiting for ip address...")
+	# 			Process.sleep(500)
+	# 			wait_for_ip_address()
+	# 		ip ->
+	# 			Logger.warn("Got ip address #{inspect ip}")
+	# 			:ok
+	# 	end
+	# end
 
-  defp redirect_logging() do
-    Logger.add_backend {LoggerFileBackend, :error}
-    Logger.configure_backend {LoggerFileBackend, :error},
-      path: "/mnt/system.log",
-      level: :warn
-  end
+  # defp redirect_logging() do
+  #   Logger.add_backend {LoggerFileBackend, :error}
+  #   Logger.configure_backend {LoggerFileBackend, :error},
+  #     path: "/mnt/system.log",
+  #     level: :warn
+  # end
 
-  defp format_appdata() do
-    case System.cmd("mke2fs", ["-t", "ext4", "-L", "APPDATA", "/dev/mmcblk0p3"]) do
-      {_, 0} -> :ok
-      _ -> :error
-    end
-  end
+  # defp format_appdata() do
+  #   case System.cmd("mke2fs", ["-t", "ext4", "-L", "APPDATA", "/dev/mmcblk0p3"]) do
+  #     {_, 0} -> :ok
+  #     _ -> :error
+  #   end
+  # end
 
-  defp maybe_mount_appdata() do
-    if !File.exists?("/mnt/.initialized") do
-      # Ignore errors
-      mount_appdata()
-      File.write("/mnt/.initialized", "Done!")
-    end
-    :ok
-  end
+  # defp maybe_mount_appdata() do
+  #   if !File.exists?("/mnt/.initialized") do
+  #     # Ignore errors
+  #     mount_appdata()
+  #     File.write("/mnt/.initialized", "Done!")
+  #   end
+  #   :ok
+  # end
 
-  defp mount_appdata() do
-    case System.cmd("mount", ["-t", "ext4", "/dev/mmcblk0p3", "/mnt"]) do
-      {_, 0} -> :ok
-      _ -> :error
-    end
-  end
+  # defp mount_appdata() do
+  #   case System.cmd("mount", ["-t", "ext4", "/dev/mmcblk0p3", "/mnt"]) do
+  #     {_, 0} -> :ok
+  #     _ -> :error
+  #   end
+  # end
 
-  defp start_writable_fs() do
-    case maybe_mount_appdata() do
-      :ok ->
-        redirect_logging()
-      :error ->
-        case format_appdata() do
-          :ok ->
-            mount_appdata()
-            redirect_logging()
-          error -> error
-        end
-    end
-  end
+  # defp start_writable_fs() do
+  #   case maybe_mount_appdata() do
+  #     :ok ->
+  #       redirect_logging()
+  #     :error ->
+  #       case format_appdata() do
+  #         :ok ->
+  #           mount_appdata()
+  #           redirect_logging()
+  #         error -> error
+  #       end
+  #   end
+  # end
 	
 end

@@ -21,7 +21,7 @@ defmodule Marvin.SmartThing.Device do
 	end
 
 	def name(%Marvin.SmartThing.Device{path: path}) do
-		path
+		String.to_atom(path)
 	end
 	
 end

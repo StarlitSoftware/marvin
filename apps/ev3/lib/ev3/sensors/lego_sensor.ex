@@ -5,7 +5,7 @@ defmodule Marvin.Ev3.LegoSensor do
 	import Marvin.Ev3.Sysfs
 	alias Marvin.Ev3
 	alias Marvin.SmartThing.Device
-	alias Marvin.SmartThing.Mock
+	alias Marvin.Ev3.{ColorSensor, TouchSensor, InfraredSensor, UltrasonicSensor, GyroSensor}
 
 	@sys_path "/sys/class/lego-sensor"
   @prefix "sensor"
@@ -103,22 +103,16 @@ defmodule Marvin.Ev3.LegoSensor do
   #### PRIVATE
 
 	defp module_for(sensor) do
-		if !Marvin.SmartThing.testing?() do
-			case sensor.type do
-				:touch -> Ev3.TouchSensor
-				:color -> Ev3.ColorSensor
-				:infrared -> Ev3.InfraredSensor
-        :ultrasonic -> Ev3.UltrasonicSensor
-        :gyro -> Ev3.GyroSensor
-			end
-		else
-			case sensor.type do
-				:touch -> Mock.TouchSensor
-				:color -> Mock.ColorSensor
-				:infrared -> Mock.InfraredSensor
-        :ultrasonic -> Mock.UltrasonicSensor
-        :gyro -> Mock.GyroSensor
-			end
+		module_for_type(sensor.type)
+	end
+
+	defp module_for_type(type) do
+		case type do
+			:touch -> TouchSensor
+			:color -> ColorSensor
+			:infrared -> InfraredSensor
+      :ultrasonic -> UltrasonicSensor
+      :gyro -> GyroSensor
 		end
 	end
 
@@ -133,7 +127,7 @@ defmodule Marvin.Ev3.LegoSensor do
 						 "touch" -> :touch
 						 "ir" -> :infrared
            end
-    sensor = %Device{mod: Marvin.Ev3,
+    sensor = %Device{mod: module_for_type(type),
 										 class: :sensor,
 										 path: path, 
 										 port: port_name, 

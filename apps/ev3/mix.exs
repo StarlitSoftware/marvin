@@ -15,7 +15,7 @@ defmodule Ev3.Mixfile do
   end
 
   def deps() do
-    [{:smart_thing, in_umbrella: true}]
+    []
   end
 
 end

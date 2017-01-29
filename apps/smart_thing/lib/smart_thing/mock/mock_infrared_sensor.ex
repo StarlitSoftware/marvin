@@ -7,7 +7,7 @@ defmodule Marvin.SmartThing.Mock.InfraredSensor do
 	alias Marvin.SmartThing.Device
 
 	def new() do
-		%Device{mod: Marvin.SmartThing.Mock,
+		%Device{mod: __MODULE__,
 						class: :sensor,
 						path: "/mock/infrared_sensor", 
 						type: :infrared,

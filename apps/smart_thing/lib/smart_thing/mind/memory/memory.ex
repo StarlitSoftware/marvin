@@ -160,12 +160,12 @@ defmodule Marvin.SmartThing.Memory do
 		{:reply, intents, state}
 	end
 
-	def handle_call(:on_motives, _from, %{motives: motives} = _state) do
-		Enum.filter(motives, &(Motive.on?(&1)))
+	def handle_call(:on_motives, _from, %{motives: motives} = state) do
+		{:reply, Enum.filter(motives, &(Motive.on?(&1))), state}
 	end
 
-	def handle_call(:transited_behavior_names, _from, %{behaviors: behaviors} = _state) do
-		Map.keys(behaviors)
+	def handle_call(:transited_behavior_names, _from, %{behaviors: behaviors} = state) do
+		{:reply, Map.keys(behaviors), state}
 	end
 
 	### PRIVATE

@@ -1,5 +1,8 @@
 defmodule Marvin.SmartThing.Utils do
+
 	@moduledoc "Utility functions"
+
+	alias Marvin.SmartThing
 
 	@doc "The time now in msecs"
 	def now() do
@@ -23,28 +26,20 @@ defmodule Marvin.SmartThing.Utils do
 		end
 	end
 
-	def mock?() do
-		Application.get_env(:smart_thing, :mock, true)
-	end
-
 	def platform_dispatch(fn_name) do
 		platform_dispatch(fn_name, [])
 	end
 	
 	def platform_dispatch(fn_name, args) do
-		apply(platform(), fn_name, args)
+		apply(SmartThing.platform(), fn_name, args)
 	end
 
 	def get_voice() do
 		platform_dispatch(:voice)
 	end
 	
-	def platform() do
-		Application.get_env(:smart_thing, :platform)
-	end
-
 	def pg2_group() do
-		Application.get_env(:pg2, :group)
+		Application.get_env(:smart_thing, :group)
 	end
 	
 end

@@ -5,7 +5,6 @@ defmodule Marvin.Ev3.LegoSound do
 
   require Logger
   alias Marvin.SmartThing.Device
-	import Marvin.SmartThing.Utils, only: [mock?: 0]
 
   @sys_path "/sound"
 
@@ -26,9 +25,9 @@ defmodule Marvin.Ev3.LegoSound do
     sound_player.type
   end
 
-  @doc "Execute a cound command"
+  @doc "Execute a sound command"
   def execute_command(sound_player, command, params) do
-    spawn(fn -> apply(Marvin.Ev3.LegoSound, command, [sound_player | params]) end)
+    spawn(fn -> apply(__MODULE__, command, [sound_player | params]) end)
     sound_player
   end
 
@@ -43,13 +42,8 @@ defmodule Marvin.Ev3.LegoSound do
 	
   @doc "Speak out words with a given volume, speed and voice"
   def speak(words, volume, speed, voice \\ "en") do
-    if mock?() do
-      args =  ["-a", "#{volume}", "-s", "#{speed}", "-v", "#{voice}", words]
-      System.cmd("espeak", args)
-    else
-			:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}" --stdout | aplay')
-			:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}"')
-    end
+		:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}" --stdout | aplay')
+		:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}"')
   end
 
   @doc "Speak words loud and clear"

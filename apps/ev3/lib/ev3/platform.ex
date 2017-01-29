@@ -81,7 +81,7 @@ defmodule Marvin.Ev3.Platform do
 		Application.get_env(:ev3, :beacon_channel, 0)
 	end
 
-	def get_voice() do
+	def voice() do
 		Application.get_env(:ev3, :voice, "en-us")
 	end
 

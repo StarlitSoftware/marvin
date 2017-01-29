@@ -9,7 +9,6 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 
 	### Supervisor Callbacks
 
-	@spec start_link() :: {:ok, pid}
 	@doc "Start the smart thing supervisor, linking it to its parent supervisor"
   def start_link() do
 		Logger.info("Starting #{@name}")
@@ -24,7 +23,7 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 			worker(Attention, []),
 			worker(InternalClock, []),
 		 	worker(PG2Communicator, []),
-			supervisor(DetectosSupervisor, []),
+			supervisor(DetectorsSupervisor, []),
 		 	supervisor(ActuatorsSupervisor, []),
 		 	supervisor(BehaviorsSupervisor, []),
 		 	supervisor(MotivatorsSupervisor, []),

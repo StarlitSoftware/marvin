@@ -30,8 +30,8 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 
 # Configures Elixir's Logger
-config :logger, level: :error,
-backends: [{LoggerFileBackend, :log}]
+config :logger, level: :info
+# backends: [{LoggerFileBackend, :log}]
 
 config :logger, :log,
 path: "/mnt/ev3.log",
@@ -40,13 +40,11 @@ metadata: [:request_id]
 
 config :smart_thing,
 mock: true,
-platform: Marvin.Ev3.Platform,
-display: Marvin.Ev3.Display
-
-config :pg2, # TODO move to community config
-nodes: [:"marvin@nerves-2091", :"rodney@nerves-5e58"],
+mock_platform: Marvin.SmartThing.Mock.Platform,
+platform: Marvin.SmartThing.Ev3.Platform,
+display: Marvin.SmartThing.Ev3.Display,
 group: :community
 
-import_config "nerves.exs"
+# import_config "nerves.exs"
 
 # import_config "#{Mix.env}.exs"

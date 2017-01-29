@@ -2,9 +2,7 @@ defmodule Marvin.Ev3.LegoMotor do
 	@moduledoc "Lego motors access"
 
   alias Marvin.SmartThing.Device
-		alias Marvin.SmartThing.Mock
 	import Marvin.Ev3.Sysfs
-	import Marvin.SmartThing.Utils, only: [mock?: 0]
 	require Logger
 
 	@sys_path "/sys/class/tacho-motor"
@@ -18,31 +16,17 @@ defmodule Marvin.Ev3.LegoMotor do
 
 	@doc "Generates a list of all plugged in motor devices"
 	def motors() do
-		if mock?() do
-			[Mock.Tachomotor.new(:large, "outA"),
-			 Mock.Tachomotor.new(:large, "outB"),
-			 Mock.Tachomotor.new(:medium, "outC")]
-		else
-	 		case File.ls(@sys_path) do
-				{:ok, files} -> files
-				{:error, reason} ->
-					Logger.warn("Failed getting motor files: #{inspect reason}")
-					[]
-			end
-			|> Enum.filter(&(String.starts_with?(&1, @prefix)))
-			|> Enum.map(&(init_motor("#{@sys_path}/#{&1}")))
+	 	case File.ls(@sys_path) do
+			{:ok, files} -> files
+			{:error, reason} ->
+				Logger.warn("Failed getting motor files: #{inspect reason}")
+				[]
 		end
+		|> Enum.filter(&(String.starts_with?(&1, @prefix)))
+		|> Enum.map(&(init_motor("#{@sys_path}/#{&1}")))
   end
 
-	defp module_for(_motor) do
-		if !Marvin.SmartThing.testing?() do
-			Tachomotor
-		else
-			Mock.Tachomotor
-		end
-	end
-
- @doc "Get the list of senses from a motor"
+	@doc "Get the list of senses from a motor"
 	def senses(motor) do
 		apply(module_for(motor), :senses, [motor])
 	end
@@ -82,7 +66,7 @@ defmodule Marvin.Ev3.LegoMotor do
 	@doc "Execute a motor command"
 	def execute_command(motor, command, params) do
 #		Logger.info("--- Executing motor #{motor.path} #{command} #{inspect params}")
-		apply(module_for(motor), command, [motor | params])
+		apply(motor.mod, command, [motor | params])
 	end
 
 	@doc "Get motor controls"
@@ -99,6 +83,14 @@ defmodule Marvin.Ev3.LegoMotor do
 
 	### PRIVATE
 
+	defp module_for(motor) do
+		module_for_type(motor.type)
+	end
+
+	defp module_for_type(_type) do
+		Ev3.Tachomotor
+	end
+	
   defp init_motor(path) do
 		port_name = read_sys(path, "address")
     driver_name = read_sys(path, "driver_name")
@@ -107,7 +99,7 @@ defmodule Marvin.Ev3.LegoMotor do
 						 "l" -> :large
 						 "m" -> :medium
            end
-    motor = %Device{mod: Marvin.Ev3,
+    motor = %Device{mod: module_for_type(type),
 										class: :motor,
 										path: path, 
 										port: port_name, 

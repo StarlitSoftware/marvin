@@ -6,7 +6,7 @@ defmodule Marvin.SmartThing.Mock.UltrasonicSensor do
 	alias Marvin.SmartThing.Device
 
   def new() do
-    %Device{mod: Marvin.SmartThing.Mock,
+    %Device{mod: __MODULE__,
 						class: :sensor,
             path: "/mock/ultrasonic_sensor",
             type: :ultrasonic,

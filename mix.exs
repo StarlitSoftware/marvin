@@ -21,7 +21,8 @@ defmodule Marvin.Mixfile do
   # Dependencies listed here are available only for this project
   # and cannot be accessed from applications inside the apps folder
   defp deps() do
-    []
+    [{:logger_file_backend, "~> 0.0.9"}
+		]
   end
 
 	def application() do

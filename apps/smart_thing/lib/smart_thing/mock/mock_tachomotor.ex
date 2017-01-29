@@ -8,7 +8,7 @@ defmodule Marvin.SmartThing.Mock.Tachomotor do
   require Logger
 	
 	def new(type, port_name) do
-		%Device{mod: Marvin.SmartThing.Mock,
+		%Device{mod: __MODULE__,
 						class: :motor,
 						path: "/mock/#{type}_motor/#{port_name}", 
 						type: type,

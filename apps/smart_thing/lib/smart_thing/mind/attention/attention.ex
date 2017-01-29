@@ -15,12 +15,16 @@ defmodule Marvin.SmartThing.Attention do
 
 	@doc "Poll all currently meaningful senses, unless already polling"
 	def tick() do
-		GenServer.call(@name, :tick)
+		GenServer.cast(@name, :tick)
 	end
 
 	@doc "Reset attended_senses to nil so they are recomputed when needed"
 	def reset() do
-		GenServer.call(@name, :reset)
+		GenServer.cast(@name, :reset)
+	end
+
+	def terminate(reason, _state) do
+		Logger.warn("#{@name} terminating: #{inspect reason}")
 	end
 
 	### Callbacks
@@ -39,19 +43,20 @@ defmodule Marvin.SmartThing.Attention do
 		}
 	end
 	
-  def handle_call(:tick, _from, %{polling: polling?} = state) do
+  def handle_cast(:tick, %{polling: polling?} = state) do
 		if polling? do
 			Logger.info("TICK: already polling")
-			{:reply, :ok, state}
+			{:noreply, state}
 		else
 			Logger.info("TICK: polling")
 			attended_senses = find_attended_senses(state)
 			spawn_link(fn() -> detect(attended_senses, state) end)
 		  {:noreply, %{state | polling: true, attended_senses: attended_senses}}
 		end
+		
 	end
-	def handle_call(:reset, _from, state) do
-		{:reply, :ok, %{state | attended_senses: nil}}
+	def handle_cast(:reset, state) do
+		{:noreply, %{state | attended_senses: nil}}
 	end
 
 	def handle_info(:polling_completed, state) do
@@ -63,7 +68,7 @@ defmodule Marvin.SmartThing.Attention do
 	defp detect(attended_senses, %{sensing_devices: sensing_devices} = _state) do
 		Enum.each(sensing_devices,
 			fn(sensing_device) ->
-				device_senses = apply(sensing_device.mod, :senses, [])
+				device_senses = apply(sensing_device.mod, :senses, [sensing_device])
 				Enum.each(device_senses,
 					fn(device_sense) ->
 						if device_sense in attended_senses do
@@ -78,7 +83,7 @@ defmodule Marvin.SmartThing.Attention do
 		Enum.reduce(sensing_devices,
 								[],
 			fn(sensing_device, acc) ->
-				apply(sensing_device.mod, :senses, []) ++ acc
+				apply(sensing_device.mod, :senses, [sensing_device]) ++ acc
 			end) |> Enum.uniq()
 	end
 	

@@ -10,3 +10,4 @@ defmodule Marvin.SmartThing.SoundSpec do
   end
 
 end
+

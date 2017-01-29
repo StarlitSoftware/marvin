@@ -5,7 +5,7 @@ defmodule Marvin.SmartThing.Mock.LED do
 	require Logger
 
 	def new(color, position) do
-		%Device{mod: Marvin.SmartThing.Mock,
+		%Device{mod: __MODULE__,
 						class: :led,
 						path: "/mock/led/#{position}:#{color}",
 						type: "#{position}:#{color}",

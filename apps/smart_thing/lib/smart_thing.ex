@@ -1,38 +1,39 @@
 defmodule Marvin.SmartThing do
 
+	alias Marvin.SmartThing.Communicators
 	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
-	alias Marvin.SmartThing.{Device, Mock}
-
+	
 	@doc "Whether in test mode"
 	def testing?() do
 		Application.get_env(:smart_thing, :mock)
 	end
 
-	def sensors() do
-		if Marvin.SmartThing.testing?() do
-			[Mock.TouchSensor.new(),
-       Mock.ColorSensor.new(),
-       Mock.InfraredSensor.new(),
-       Mock.UltrasonicSensor.new(),
-       Mock.GyroSensor.new()]
+	def platform() do
+		if testing?() do
+			Application.get_env(:smart_thing, :mock_platform)
 		else
-			platform_dispatch(:sensors)
+			Application.get_env(:smart_thing, :platform)
 		end
-  end
+	end
+
+	def sensors() do
+		platform_dispatch(:sensors)
+	end
 
 	def motors() do
-		if Marvin.SmartThing.testing?() do
-			[Mock.Tachomotor.new(:large, "outA"),
-			 Mock.Tachomotor.new(:large, "outB"),
-			 Mock.Tachomotor.new(:medium, "outC")]
-    else
-			platform_dispatch(:motors)
-		end
+		platform_dispatch(:motors)
 	end
 
-	@doc "Nudge the value of a sense from a mock device"
-	def nudge(%Device{mock: true} = device, sense, value, previous_value) do 
-	    apply(device.mod, :nudge, [device, sense, value, previous_value])
+	def leds() do
+		platform_dispatch(:leds)
 	end
 
+	def sound_players() do
+		platform_dispatch(:sound_players)
+	end
+
+	def communicators() do
+		Communicators.communicators()
+	end
+	
 end
