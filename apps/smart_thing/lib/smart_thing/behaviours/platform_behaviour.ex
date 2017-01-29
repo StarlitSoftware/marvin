@@ -37,14 +37,14 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 	@callback get_voice() :: binary
 
 	@doc "Read a sensor's sense"
-	@callback sensor_read_sense(device, sense)
+	@callback sensor_read_sense(devce :: %Marvin.SmartThing.Device{}, sense :: any) :: any
 
 	@doc "Get a sensor's sensitivity for a sense"
-	@callback sensor_sensitivity(device, sense)
+	@callback sensor_sensitivity(device :: %Marvin.SmartThing.Device{}, sense :: any) :: any
 	
 	@doc "Read a motor's sense"
-	@callback motor_read_sense(device, sense)
+	@callback motor_read_sense(device :: %Marvin.SmartThing.Device{}, sense :: any) :: any
 
 	@doc "Get a motor's sensitivity for a sense"
-	@callback motor_sensitivity(device, sense)
+	@callback motor_sensitivity(device :: %Marvin.SmartThing.Device{}, sense :: any) :: any
 end

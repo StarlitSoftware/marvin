@@ -1,6 +1,7 @@
 defmodule Marvin.SmartThing do
 
 	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
+	alias Marvin.SmartThing.{Device, Mock}
 
 	@doc "Whether in test mode"
 	def testing?() do
@@ -31,7 +32,7 @@ defmodule Marvin.SmartThing do
 
 	@doc "Nudge the value of a sense from a mock device"
 	def nudge(%Device{mock: true} = device, sense, value, previous_value) do 
-	    apply(module_for(device), :nudge, [device, sense, value, previous_value])
+	    apply(device.mod, :nudge, [device, sense, value, previous_value])
 	end
 
 end

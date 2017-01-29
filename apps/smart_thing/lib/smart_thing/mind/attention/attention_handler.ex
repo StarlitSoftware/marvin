@@ -17,7 +17,7 @@ defmodule Marvin.SmartThing.AttentionHandler do
 		{:ok, state}
 	end
 
-	def handle_event({:motivated, motive}, state) do
+	def handle_event({:motivated, _motive}, state) do
 		Attention.reset()
 		{:ok, state}
 	end
@@ -27,7 +27,7 @@ defmodule Marvin.SmartThing.AttentionHandler do
 		{:ok, state}
 	end
 
-	def handle_event({:behavior_transited, behavior_name, to_state_name}, state) do
+	def handle_event({:behavior_transited, _behavior_name, _to_state_name}, state) do
 		Attention.reset()
 		{:ok, state}
 	end

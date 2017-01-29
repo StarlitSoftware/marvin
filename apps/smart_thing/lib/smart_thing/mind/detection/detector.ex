@@ -2,15 +2,14 @@ defmodule Marvin.SmartThing.Detector do
 	@moduledoc "A detector polling a sensor or motor for senses it implements"
 
 	require Logger
-  alias Marvin.SmartThing.Percept
-	alias Marvin.SmartThing.CNS
-  alias Marvin.SmartThing.Device
+  alias Marvin.SmartThing.{Percept, CNS, Device}
 	alias Marvin.SmartThing
+	import Marvin.SmartThing.Utils, only: [platform_dispatch: 2]
 
 	@ttl 10_000 # detected percept is retained for 10 secs # TODO set in config
 
 	@doc "Start a detector on a sensing device, to be linked to its supervisor"
-	def start_link(device, used_senses) do
+	def start_link(device) do
 		name = Device.name(device)
 		{:ok, pid} = Agent.start_link(
 			fn() ->

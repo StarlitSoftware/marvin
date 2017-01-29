@@ -4,7 +4,6 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	require Logger
 	alias Marvin.SmartThing
 	alias Marvin.SmartThing.{CNS, Attention, Memory, DetectorsSupervisor, PerceptorsSupervisor, Perception, MotivatorsSupervisor, BehaviorsSupervisor, ActuatorsSupervisor, Motivation, Behaviors, Actuation, InternalClock, PG2Communicator}
-	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
 
 	@name __MODULE__
 
