@@ -35,5 +35,10 @@ defmodule Marvin.SmartThing do
 	def communicators() do
 		Communicators.communicators()
 	end
+
+	def actuator_configs() do
+		platform_dispatch(:actuator_configs)
+	end
+	
 	
 end

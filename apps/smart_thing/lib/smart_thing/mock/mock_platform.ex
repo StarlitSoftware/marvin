@@ -100,6 +100,10 @@ defmodule Marvin.SmartThing.Mock.Platform do
 		apply(device.mod, :sensitivity, [device, sense])
 	end
 
+	def actuator_configs() do
+		Marvin.Ev3.Actuation.actuator_configs() # Use the Ev3 actuators (acutal actuators are mocked)
+	end
+
 	###
 
 	def execute_command(%Device{mock: true} = device, command, params) do

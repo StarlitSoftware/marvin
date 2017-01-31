@@ -3,7 +3,7 @@ defmodule Marvin.SmartThing.Application do
 	
   use Application
   require Logger
-	alias Marvin.SmartThing.{SmartThingSupervisor, CNS}
+	alias Marvin.SmartThing.{SmartThingSupervisor, CNS, InternalClock}
 	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
 
   @poll_runtime_delay 5000
@@ -24,6 +24,7 @@ defmodule Marvin.SmartThing.Application do
 		SmartThingSupervisor.start_execution()
 		SmartThingSupervisor.start_perception()
     Process.spawn(fn -> push_runtime_stats() end, [])
+		InternalClock.resume()
 		result
   end
 

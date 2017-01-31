@@ -4,7 +4,7 @@ defmodule Marvin.Ev3.Platform do
 
 	@moduledoc "Module implementing smart thing platform_dispatch calls"
 
-	alias Marvin.Ev3.{LegoSensor, LegoMotor, LegoSound, LegoLED}
+	alias Marvin.Ev3.{LegoSensor, LegoMotor, LegoSound, LegoLED, Actuation}
 	
 	### PlatformBehaviour
 	
@@ -99,6 +99,10 @@ defmodule Marvin.Ev3.Platform do
 	
 	def motor_sensitivity(device, sense) do
 		LegoMotor.sensitivity(device, sense)
+	end
+
+	def actuator_configs() do
+		Actuation.actuator_configs()
 	end
 
 	###

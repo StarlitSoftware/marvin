@@ -12,7 +12,7 @@ defmodule Marvin.SmartThing.InternalClock do
   def start_link() do
     {:ok, pid} = Agent.start_link(
       fn() ->
-        %{responsive: true, tock: now()}
+        %{responsive: false, tock: nil}
       end,
       [name: @name]
     )
@@ -57,7 +57,7 @@ defmodule Marvin.SmartThing.InternalClock do
 		Agent.update(
 			@name,
 			fn(state) ->
-				%{state | responsive: true}
+				%{state | responsive: true, tock: now()}
 			end)
 	end
 

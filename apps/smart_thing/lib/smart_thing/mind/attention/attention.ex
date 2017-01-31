@@ -45,7 +45,7 @@ defmodule Marvin.SmartThing.Attention do
 	
   def handle_cast(:tick, %{polling: polling?} = state) do
 		if polling? do
-			Logger.info("TICK: already polling")
+			Logger.warn("TICK: already polling")
 			{:noreply, state}
 		else
 			Logger.info("TICK: polling")
@@ -72,6 +72,7 @@ defmodule Marvin.SmartThing.Attention do
 				Enum.each(device_senses,
 					fn(device_sense) ->
 						if device_sense in attended_senses do
+							Logger.info("POLLING #{device_sense} of #{inspect sensing_device.type}")
 							Detector.poll(Device.name(sensing_device), device_sense)
 						end
 					end)
@@ -80,11 +81,13 @@ defmodule Marvin.SmartThing.Attention do
 	end
 
 	defp detected_senses(sensing_devices) do
-		Enum.reduce(sensing_devices,
+		senses = Enum.reduce(sensing_devices,
 								[],
 			fn(sensing_device, acc) ->
 				apply(sensing_device.mod, :senses, [sensing_device]) ++ acc
 			end) |> Enum.uniq()
+		Logger.debug("ALL DETECTED senses for #{inspect sensing_devices} => #{inspect senses}")
+		senses
 	end
 	
 	# The senses that directly or indirectly (via derived percepts) can:
@@ -96,24 +99,28 @@ defmodule Marvin.SmartThing.Attention do
 															attended_senses: attended_senses,
 															detected_senses: detected_senses} = _state) do
 	  if attended_senses != nil do
+			Logger.debug("CACHED attended senses => #{inspect attended_senses}")
 			attended_senses
 		else
 			on_motives = Memory.on_motives()
-			top_attended_senses = attended_motive_senses(on_motives, motivator_configs) ++
-				attended_behavior_senses(on_motives, behavior_configs)
-			Enum.reduce(top_attended_senses,
-									[],
+			attended_motive_senses = attended_motive_senses(on_motives, motivator_configs)
+			attended_behavior_senses =	attended_behavior_senses(on_motives, behavior_configs)
+			senses = Enum.reduce(attended_motive_senses ++ attended_behavior_senses,
+													 [],
 				fn(top_sense, acc) ->
 					detected_senses_for(top_sense, perceptor_configs, detected_senses) ++ acc
 				end) |> Enum.uniq()
+			Logger.info("ALL ATTENDED senses => #{inspect senses}")
+			senses
 		end
 	end
 
 	defp attended_motive_senses(on_motives, motivator_configs) do
-		uninhibited_motive_names = Enum.filter(all_motive_names(motivator_configs),
+		uninhibited_motive_names = Enum.reject(all_motive_names(motivator_configs),
 			fn(motive_name) ->
 				Enum.any?(on_motives, &(motive_name in &1.inhibits))
 			end)
+		Logger.debug("UNINHIBITED MOTIVES => #{inspect uninhibited_motive_names}")
 		Enum.reduce(uninhibited_motive_names,
 								[],
 			fn(motive_name, acc) ->
@@ -176,25 +183,26 @@ defmodule Marvin.SmartThing.Attention do
 	end
 
 	defp expand_sense(sense, perceptor_configs, results) do
-		case perceptor_config_named(sense, perceptor_configs) do
-			nil ->
-				results
-			perceptor_config ->
-				case Enum.reject(perceptor_config.focus.senses, &(&1 in results)) do
-					[] ->
-						results
-					sub_senses ->
-						Enum.reduce(sub_senses,
-												results ++ sub_senses,
-							fn(sub_sense, acc) ->
-								acc ++ expand_sense(sub_sense, perceptor_configs, acc)
-							end)
-				end
-		end
+		expanded = case perceptor_config_named(sense, perceptor_configs) do
+								 nil ->
+									 [sense | results]
+								 perceptor_config ->
+									 case Enum.reject(perceptor_config.focus.senses, &(&1 in results)) do
+										 [] ->
+											 results
+										 sub_senses ->
+											 Enum.reduce(sub_senses,
+																	 results ++ sub_senses,
+												 fn(sub_sense, acc) ->
+													 expand_sense(sub_sense, perceptor_configs, acc)
+												 end)
+									 end
+							 end
+		expanded
 	end
 
 	defp perceptor_config_named(sense, perceptor_configs) do
-		Enum.find(perceptor_configs, &(&1 == sense))
+		Enum.find(perceptor_configs, &(&1.name == sense))
 	end				
 
 end

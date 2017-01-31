@@ -161,7 +161,21 @@ defmodule Marvin.SmartThing.Memory do
 	end
 
 	def handle_call(:on_motives, _from, %{motives: motives} = state) do
-		{:reply, Enum.filter(motives, &(Motive.on?(&1))), state}
+		on_motives = Enum.reduce(Map.keys(motives),
+														 [],
+			fn(about, acc) ->
+				case Map.fetch!(motives, about) do
+					[] ->
+						acc
+					[motive | _] ->
+						if Motive.on?(motive) do
+							[motive | acc]
+						else
+							acc
+						end
+				end
+			end)
+		{:reply, on_motives, state}
 	end
 
 	def handle_call(:transited_behavior_names, _from, %{behaviors: behaviors} = state) do
@@ -186,12 +200,12 @@ defmodule Marvin.SmartThing.Memory do
 		end
 	end
 
-	defp update_motives(motive, []) do
+	defp update_motives(%Motive{} = motive, []) do
 		CNS.notify_memorized(:new, motive)
 		[motive]
 	end
 	
-	defp update_motives(motive, [current|rest]) do
+	defp update_motives(%Motive{} = motive, [current|rest]) do
 		if motive.value != current.value do
 			CNS.notify_memorized(:new, motive)
 			[motive, current | rest]

@@ -1,4 +1,4 @@
-defmodule Marvin.SmartThing.Actuation do
+defmodule Marvin.Ev3.Actuation do
 	@moduledoc "Provides the configurations of all actuators to be activated"
 
 	require Logger

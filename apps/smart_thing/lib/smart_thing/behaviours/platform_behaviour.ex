@@ -47,4 +47,8 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 
 	@doc "Get a motor's sensitivity for a sense"
 	@callback motor_sensitivity(device :: %Marvin.SmartThing.Device{}, sense :: any) :: any
+
+	@doc "Get the actuator configurations"
+	@callback actuator_configs() :: any
+	
 end

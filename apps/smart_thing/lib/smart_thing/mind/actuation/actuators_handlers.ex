@@ -4,11 +4,12 @@ defmodule Marvin.SmartThing.ActuatorsHandler do
 	require Logger
 	use GenEvent
 
-	alias Marvin.SmartThing.{Actuation, Actuator}
+	alias Marvin.SmartThing.{Actuator}
+	alias Marvin.SmartThing
 
 	def init(_) do
 		Logger.info("Starting #{__MODULE__}")
-		actuator_configs = Actuation.actuator_configs()
+		actuator_configs = SmartThing.actuator_configs() # dispatches to platform
 		{:ok, %{actuator_configs: actuator_configs}}
 	end
 
