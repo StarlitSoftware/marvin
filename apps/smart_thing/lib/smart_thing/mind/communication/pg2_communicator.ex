@@ -4,12 +4,12 @@ defmodule Marvin.SmartThing.PG2Communicator do
 	@behaviour Marvin.SmartThing.Communicating
 	
 	use GenServer
-	alias Marvin.SmartThing.Percept
-	alias Marvin.SmartThing.CNS
-	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
+	alias Marvin.SmartThing.{Percept, CNS}
+	alias Marvin.SmartThing
 	require Logger
 
 	@name __MODULE__
+	@ttl 10_000
 
 	### API
 
@@ -19,40 +19,74 @@ defmodule Marvin.SmartThing.PG2Communicator do
 		GenServer.start_link(@name, [], [name: @name])
 	end
 
-	@doc "Communicate a percept to the team"
-	def communicate(device, info, team) do
-		GenServer.cast(@name, {:communicate, device, info, team})
+	@doc "Broadcast info to the community"
+	def broadcast(_device, info) do
+		GenServer.cast(@name, {:broadcast, info})
 	end
 
+	@doc "Send info to a community member"
+	def remote_send(to_node, info, community_name) do
+    id_channel = SmartThing.id_channel() # how to sense the sender
+		GenServer.cast(to_node, {:communication, Node.self(), info, id_channel, community_name})
+	end
+	
+  @doc "Get community name"
+	def community_name() do
+		Application.get_env(:smart_thing, :community)
+	end
 
+	def senses_awakened_by(sense) do
+		GenServer.call(@name, {:senses_awakened_by, sense})
+	end
+	
 	### CALLBACK
 
 	def init([]) do
-		group = Application.get_env(:pg2, :group)
-		:pg2.start()
-		:pg2.create(group)
-		:pg2.join(group, self())
-		{:ok, %{group: group}}
+		group = community_name() # the pg2 group is the community's name
+		{:ok, _pid} = :pg2.start()
+		:ok = :pg2.create(group)
+		:ok = :pg2.join(group, self())
+		Logger.info("Joined community #{group}")
+		{:ok, %{group: group, id_channels: []}}
 	end
 
-	def handle_cast({:communicate, device, info, team}, state =  %{group: group}) do
+	def handle_cast({:broadcast, info}, %{group: group} = state) do
 		members = :pg2.get_members(group)
-    thing_channel = platform_dispatch(:thing_channel)
+		Logger.info("COMMUNICATOR #{inspect Node.self()} broadcasting #{inspect info} to #{inspect Node.list()}")
+		community_name = community_name()
 		members
-		|> Enum.each(&(GenServer.cast(&1, {:communication, Node.self(), info, team, thing_channel, device.props.ttl})))
-		Logger.info("COMMUNICATOR  #{inspect Node.self()} communicated #{inspect info} to team #{team} in #{inspect members}")
+		|> Enum.each(&(remote_send(&1, info, community_name)))
 		{:noreply, state}
 	end
 
-	def handle_cast({:communication, node, info, team, thing_channel, ttl}, state) do # ttl for what's communicated
-		if node != Node.self() do
-			Logger.info("COMMUNICATOR #{inspect Node.self()} heard #{inspect info} for team #{team} from #{inspect node}")
-			percept = Percept.new(about: :heard, value: %{robot: node, team: team, info: info, thing_channel: thing_channel})
+	def handle_cast({:communication, from_node, info, id_channel, community_name},
+									%{id_channels: id_channels} = state) do 
+		if from_node != Node.self() do
+			Logger.info("COMMUNICATOR #{inspect Node.self()} heard #{inspect info} from #{inspect from_node} in community #{community_name} and with id channel #{id_channel}")
+			percept = Percept.new(about: :heard,
+														value: %{from: from_node, info: info, id_channel: id_channel, community: community_name})
+			CNS.notify_id_channel(id_channel, community_name) # not handled by anyone for now
 			CNS.notify_perceived(%{percept |
-														 ttl: ttl,
+														 ttl: @ttl,
 														 source: @name})
+			{:noreply, %{state | id_channels: ([id_channel | id_channels] |> Enum.uniq())}}
+		else
+			{:noreply, state}
 		end
-		{:noreply, state}
-	end		
+	end
 
-end
+	def handle_call({:senses_awakened_by, sense}, _from, %{id_channels: id_channels} = state) do
+		senses = case sense do
+							 :heard ->
+								 Enum.reduce(id_channels,
+														 [],
+									 fn(id_channel, acc) ->
+										 acc ++ SmartThing.senses_for_id_channel(id_channel)
+									 end)
+							 _ ->
+								 []
+						 end
+		{:reply, senses, state}
+	end
+
+end	

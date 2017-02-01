@@ -83,8 +83,8 @@ defmodule Marvin.Ev3.Actuation do
 													 %CommSpec{name: :comms, type: :pg2} # could set props.ttl to something other than 30 secs default
 												 ],
 												 activations: [
-													 %Activation{intent: :communicate, # intent value = %{info: info, team: team}
-																			 action: communicate()}
+													 %Activation{intent: :broadcast, # intent value = %{info: info}
+																			 action: broadcast()}
 												 ])													 
 		]
 	end
@@ -270,10 +270,10 @@ defmodule Marvin.Ev3.Actuation do
 
 	# communications
 	
-	defp communicate() do
+	defp broadcast() do
 		fn(intent, communicators) ->
-			Script.new(:communicate, communicators)
-			|> Script.add_step(:comms, :communicate, [intent.value])
+			Script.new(:broadcast, communicators)
+			|> Script.add_step(:comms, :broadcast, [intent.value])
 		end
 	end
   

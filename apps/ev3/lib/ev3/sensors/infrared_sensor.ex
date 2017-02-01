@@ -9,15 +9,25 @@ defmodule Marvin.Ev3.InfraredSensor do
 	@proximity "IR-PROX"
 	@seek "IR-SEEK"
   @remote "IR-REMOTE"
-  @max_beacon_channels 1
+  @max_beacon_channels 4
 	
 	### Sensing behaviour
 	
 	def senses(_) do
-		beacon_senses = Enum.map(1.. @max_beacon_channels, 
-														 &([{:beacon_heading, &1}, {:beacon_distance, &1}, {:beacon_on, &1}, {:remote_buttons, &1}]))
-		|> List.flatten()
+		beacon_senses = Enum.reduce(1 .. @max_beacon_channels,
+																[],
+			fn(channel, acc) ->
+				acc ++
+					[{:beacon_heading, channel},
+					 {:beacon_distance, channel},
+					 {:beacon_on, channel},
+					 {:remote_buttons, channel}]
+			end)
 		[:proximity | beacon_senses]
+	end
+
+	def beacon_senses_for(channel) do
+		[{:beacon_heading, channel}, {:beacon_distance, channel}, {:beacon_on, channel}]
 	end
 
 	def read(sensor, sense) do

@@ -4,7 +4,8 @@ defmodule Marvin.SmartThing.Application do
   use Application
   require Logger
 	alias Marvin.SmartThing.{SmartThingSupervisor, CNS, InternalClock}
-	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
+	alias Marvin.SmartThing
+  import Supervisor.Spec, warn: false
 
   @poll_runtime_delay 5000
 
@@ -13,11 +14,10 @@ defmodule Marvin.SmartThing.Application do
   def start(_type, _args) do
 		Logger.info("Starting #{__MODULE__}")
 #    initialize_nerves() # TODO
-		connect_to_nodes() # Create P2P cluster
-    import Supervisor.Spec, warn: false
+		connect_to_nodes()
     children = [
 			supervisor(SmartThingSupervisor, [])
-#			worker(display(), [])
+#			worker(display(), []) # TODO
     ]
     opts = [strategy: :one_for_one, name: :root_supervisor]
     result = Supervisor.start_link(children, opts)
@@ -49,26 +49,15 @@ defmodule Marvin.SmartThing.Application do
 		CNS.notify_shutdown()
 	end
 
-  # def ipaddr() do
-  #   case Nerves.NetworkInterface.settings("wlan0") do
-  #     {:ok, settings} -> settings.ipv4_address
-  #     _ -> "Unknown"
-  #   end
-  # end
-
 	def display() do
 		Application.get_env(:smart_thing, :display)
-	end
-
-	def nodes() do
-		platform_dispatch(:nodes)
 	end
 
 
   ### Private
 
 	defp connect_to_nodes() do
-		nodes()
+		SmartThing.nodes()
 		|> Enum.each(&(Node.connect(&1)))
 		Logger.warn("#{Node.self()} is connected to #{inspect Node.list()}")
 	end
@@ -108,7 +97,7 @@ defmodule Marvin.SmartThing.Application do
   # end
 
 	# defp wait_for_ip_address() do
-	# 	case Ev3.ipaddr() do
+	# 	case ipaddr() do
 	# 		"Unknown" ->
 	# 			Logger.warn("Waiting for ip address...")
 	# 			Process.sleep(500)
@@ -118,6 +107,13 @@ defmodule Marvin.SmartThing.Application do
 	# 			:ok
 	# 	end
 	# end
+
+  # defp ipaddr() do
+  #   case Nerves.NetworkInterface.settings("wlan0") do
+  #     {:ok, settings} -> settings.ipv4_address
+  #     _ -> "Unknown"
+  #   end
+  # end
 
   # defp redirect_logging() do
   #   Logger.add_backend {LoggerFileBackend, :error}

@@ -43,7 +43,8 @@ mock: true,
 mock_platform: Marvin.SmartThing.Mock.Platform,
 platform: Marvin.SmartThing.Ev3.Platform,
 display: Marvin.SmartThing.Ev3.Display,
-group: :community
+community: :lego,
+nodes: [:"thing_one@ukemi", :"thing_two@ukemi"]
 
 # import_config "nerves.exs"
 

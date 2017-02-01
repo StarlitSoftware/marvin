@@ -3,7 +3,7 @@ defmodule Marvin.SmartThing.Attention do
 	@moduledoc "Responsible for attention. On each clock tick, polls only the sensors that senses what matters here and now, unless already in the midst of a polling run."
 
 	require Logger
-	alias Marvin.SmartThing.{Device, Detector, Motivation, Behaviors, Perception, Memory}
+	alias Marvin.SmartThing.{Device, Detector, Communicators, Motivation, Behaviors, Perception, Memory}
 	alias Marvin.SmartThing
 
 	@name __MODULE__
@@ -36,6 +36,7 @@ defmodule Marvin.SmartThing.Attention do
 						motivator_configs: Motivation.motivator_configs(),
 						behavior_configs: Behaviors.behavior_configs(),
 						perceptor_configs: Perception.perceptor_configs(),
+						communicators: Communicators.communicators(),
 						detected_senses: detected_senses(sensing_devices),
 						# dynamic
 						attended_senses: nil,
@@ -55,6 +56,7 @@ defmodule Marvin.SmartThing.Attention do
 		end
 		
 	end
+	
 	def handle_cast(:reset, state) do
 		{:noreply, %{state | attended_senses: nil}}
 	end
@@ -72,7 +74,7 @@ defmodule Marvin.SmartThing.Attention do
 				Enum.each(device_senses,
 					fn(device_sense) ->
 						if device_sense in attended_senses do
-							Logger.info("POLLING #{device_sense} of #{inspect sensing_device.type}")
+							Logger.info("POLLING #{inspect device_sense} of #{inspect sensing_device.type}")
 							Detector.poll(Device.name(sensing_device), device_sense)
 						end
 					end)
@@ -96,6 +98,7 @@ defmodule Marvin.SmartThing.Attention do
 	defp find_attended_senses(%{motivator_configs: motivator_configs,
 															behavior_configs: behavior_configs,
 															perceptor_configs: perceptor_configs,
+															communicators: communicators,
 															attended_senses: attended_senses,
 															detected_senses: detected_senses} = _state) do
 	  if attended_senses != nil do
@@ -105,13 +108,15 @@ defmodule Marvin.SmartThing.Attention do
 			on_motives = Memory.on_motives()
 			attended_motive_senses = attended_motive_senses(on_motives, motivator_configs)
 			attended_behavior_senses =	attended_behavior_senses(on_motives, behavior_configs)
-			senses = Enum.reduce(attended_motive_senses ++ attended_behavior_senses,
-													 [],
+			all_attended_senses = Enum.reduce(attended_motive_senses ++ attended_behavior_senses,
+																				[],
 				fn(top_sense, acc) ->
-					detected_senses_for(top_sense, perceptor_configs, detected_senses) ++ acc
+					detected_perceptor_senses_for(top_sense, perceptor_configs, detected_senses) ++
+					awakened_senses_for_communicator_sense(top_sense, communicators, detected_senses) ++
+						acc
 				end) |> Enum.uniq()
-			Logger.info("ALL ATTENDED senses => #{inspect senses}")
-			senses
+			Logger.info("ALL ATTENDED senses => #{inspect all_attended_senses}")
+			all_attended_senses
 		end
 	end
 
@@ -176,7 +181,17 @@ defmodule Marvin.SmartThing.Attention do
 			end)
 	end
 
-	defp detected_senses_for(sense, perceptor_configs, detected_senses) do
+	defp awakened_senses_for_communicator_sense(sense, communicators, detected_senses) do
+		Enum.reduce(communicators,
+								[],
+			fn(communicator, acc) ->
+				apply(communicator.mod, :senses_awakened_by, [sense]) ++ acc
+			end)
+		|> Enum.uniq
+		|> Enum.filter(&(&1 in detected_senses))
+	end
+
+	defp detected_perceptor_senses_for(sense, perceptor_configs, detected_senses) do
 		expand_sense(sense, perceptor_configs,  [])
 		|> Enum.uniq
 		|> Enum.filter(&(&1 in detected_senses))

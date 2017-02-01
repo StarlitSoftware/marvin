@@ -34,6 +34,24 @@ defmodule Marvin.SmartThing.Percept do
 							 								 transient: true}
 	end
 
+	@doc "Get the sense name, whether the sense is qualified or not"
+	def unqualified_sense(%Marvin.SmartThing.Percept{about: {sense_name, _qualifier}}) do
+		sense_name
+	end
+
+	def unqualified_sense(%Marvin.SmartThing.Percept{about: sense}) do
+		sense
+	end
+
+	@doc "Get the sense qualifier, nil if none"
+	def sense_qualifier(%Marvin.SmartThing.Percept{about: {_sense_name, qualifier}}) do
+		qualifier
+	end
+
+	def sense_qualifier(%Marvin.SmartThing.Percept{}) do
+		nil
+	end
+
 	@doc "Set the source"
 	def source(percept, source) do
 		%Marvin.SmartThing.Percept{percept | source: source}

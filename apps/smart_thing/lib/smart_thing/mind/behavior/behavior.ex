@@ -168,8 +168,8 @@ defmodule Marvin.SmartThing.Behavior do
   defp find_transition(percept, %{fsm: fsm, reflex: true, motives: motives}) do
     fsm.transitions
 		|> Enum.find(fn(transition) ->
-      Percept.sense(percept) == transition.on # TODO account for qualified percept abouts
-      and transition.condition == nil or transition.condition.(percept.value, motives)
+      Percept.unqualified_sense(percept) == transition.on 
+      and transition.condition == nil or transition.condition.(percept.value, Percept.sense_qualifier(percept), motives)
     end)
   end
 
@@ -178,8 +178,8 @@ defmodule Marvin.SmartThing.Behavior do
 		|> Enum.find(fn(transition) ->
 			transition.from != nil # else initial transition
 			and fsm_state in transition.from
-			and Percept.sense(percept) == transition.on # TODO account for qualified percept abouts
-			and (transition.condition == nil or transition.condition.(percept.value, motives))
+			and Percept.unqualified_sense(percept) == transition.on
+			and (transition.condition == nil or transition.condition.(percept.value, Percept.sense_qualifier(percept), motives))
 		end)
 	end
 

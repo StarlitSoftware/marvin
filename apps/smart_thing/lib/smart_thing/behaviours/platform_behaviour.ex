@@ -28,7 +28,7 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 	@callback shutdown() :: any
 
 	@doc "A channel identifying the smart thing"
-	@callback thing_channel() :: any
+	@callback id_channel() :: any
 
 	@doc "Returns the platform's devce manager for the given type"
 	@callback device_manager(type :: atom) :: any
@@ -50,5 +50,8 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 
 	@doc "Get the actuator configurations"
 	@callback actuator_configs() :: any
+
+	@doc "Get a list of senses associated with a smart thing's id channel"
+  @callback senses_for_id_channel(id_channel :: binary) :: [any]
 	
 end

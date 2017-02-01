@@ -3,11 +3,6 @@ defmodule Marvin.SmartThing.Behaviors do
 
 	require Logger
 	alias Marvin.SmartThing.{BehaviorConfig, FSM, Transition, CNS, Percept, Intent}
-	import Marvin.SmartThing.Utils, only: [pg2_group: 0]
-
-  defp team() do
-    pg2_group()
-  end
 
 	@doc "Give the configurations of all benaviors to be activated by motives and driven by percepts"
   def behavior_configs() do
@@ -20,11 +15,11 @@ defmodule Marvin.SmartThing.Behaviors do
       fsm: %FSM{
         transitions: [
 					%Transition{on: :collision,
-											 condition: fn(value, _) -> value == :imminent end,
+											 condition: fn(value, _sense_qualifier, _motives) -> value == :imminent end,
 										 doing: avoid_collision()
 										 },
    				%Transition{on: :collision,
-											 condition: fn(value, _) -> value == :now end,
+											 condition: fn(value, _sense_qualifier, _motives) -> value == :now end,
 										 doing: backoff(true)
 										 }
         ]
@@ -36,20 +31,19 @@ defmodule Marvin.SmartThing.Behaviors do
         fsm: %FSM{
           transitions: [
 						%Transition{on: :stuck,
-                         condition: fn(value, _) -> value end, # true or false
+                         condition: fn(value, _sense_qualifier, _motives) -> value end, # true or false
 											 doing: unstuck()
 											 }
           ]
         }
       ),
-      BehaviorConfig.new( # Reacting to communications from team mates
+      BehaviorConfig.new( # Reacting to communications from community members
         name: :confirming_heard,
         senses: [:heard],
         fsm: %FSM{
           transitions: [
 						%Transition{on: :heard,
-                         condition: fn(value, _) -> value.team == team() end, 
-												 doing: confirming_heard()
+												doing: confirming_heard()
 											 }
           ]
         }
@@ -101,13 +95,13 @@ defmodule Marvin.SmartThing.Behaviors do
 						%Transition{from: [:off_scent],
 												on: :scent_direction,
 												to: :on_scent,
-												 condition: fn({orientation, _value, _strength, channel}, _) ->
+												 condition: fn({orientation, _value, _strength, channel}, _sense_qualifier, _motives) ->
                            channel == 1 and orientation == :ahead end
 											 },
 						%Transition{from: [:on_scent, :off_scent],
 												on: :scent_direction,
 												to: :off_scent,
-												 condition: fn({orientation, _value, _strength, channel}, _) ->
+												 condition: fn({orientation, _value, _strength, channel}, _sense_qualifier, _motives) ->
                            channel == 1 and
                            orientation != :ahead end,
 											 doing: change_course()
@@ -115,19 +109,19 @@ defmodule Marvin.SmartThing.Behaviors do
 						%Transition{from: [:on_scent, :off_scent],
 												on: :scent_strength,
 												to: :off_scent,
-												 condition: fn({value, channel}, _) ->
+												 condition: fn({value, channel}, _sense_qualifier, _motives) ->
                            channel == 1 and value == :unknown end,
 											 doing: change_course()
 											 },
 						%Transition{from: [:on_scent, :off_scent, :feeding],
 												on: :food,
-												 condition: fn(value, _) -> value != :none end,
+												 condition: fn(value, _sense_qualifier, _motives) -> value != :none end,
 											 to: :feeding,
 											 doing: eat()
 											 },
 						%Transition{from: [:feeding],
 												on: :food,
-												 condition: fn(value, _) -> value == :none end,
+												 condition: fn(value, _sense_qualifier, _motives) -> value == :none end,
 											 to: :off_scent,
 											 doing: backoff(false)
 											 },
@@ -138,7 +132,7 @@ defmodule Marvin.SmartThing.Behaviors do
 				}
 			),
 
-			BehaviorConfig.new( # Track another robot to compete for a food source
+			BehaviorConfig.new( # Track another community member to compete for a food source
 				name: :tracking,
 				motivated_by: [:greed],
 				senses: [:food, :scent_strength, :scent_direction, :collision, :stuck],
@@ -156,10 +150,10 @@ defmodule Marvin.SmartThing.Behaviors do
 						%Transition{from: [:off_track],
 												on: :scent_direction,
 												to: :on_track,
-												 condition: fn({orientation, _value, _former_strength, channel}, motives) ->
+												 condition: fn({orientation, _value, _former_strength, channel}, _sense_qualifier, motives) ->
                            case find_motive(motives, :greed) do
                              nil -> false
-                             motive -> Map.get(motive.details, :beacon_channel) == channel
+                             motive -> Map.get(motive.details, :id_channel) == channel
                                and orientation == :ahead
                            end
                          end
@@ -167,10 +161,10 @@ defmodule Marvin.SmartThing.Behaviors do
 						%Transition{from: [:on_track, :off_track],
 												on: :scent_direction,
 												to: :off_track,
-												 condition: fn({orientation, _value, _former_strength, channel}, motives) ->
+												 condition: fn({orientation, _value, _former_strength, channel}, _sense_qualifier, motives) ->
                            case find_motive(motives, :greed) do
                              nil -> false
-                             motive -> Map.get(motive.details, :beacon_channel) == channel
+                             motive -> Map.get(motive.details, :id_channel) == channel
                                and orientation != :ahead
                            end
                          end,
@@ -179,10 +173,10 @@ defmodule Marvin.SmartThing.Behaviors do
 						%Transition{from: [:on_track, :off_track],
 												on: :scent_strength,
 												to: :off_scent,
-												 condition: fn({value, channel}, motives) ->
+												 condition: fn({value, channel}, _sense_qualifier, motives) ->
                            case find_motive(motives, :greed) do
                              nil -> false
-                             motive -> Map.get(motive.details, :beacon_channel) == channel
+                             motive -> Map.get(motive.details, :id_channel) == channel
                                and value == :unknown
                            end
                          end,
@@ -212,7 +206,7 @@ defmodule Marvin.SmartThing.Behaviors do
 						%Transition{from: [:panicking],
 												on: :danger,
 												to: :ended,
-												 condition: fn(value, _) -> value == :none end,
+												 condition: fn(value, _sense_qualifier, _motives) -> value == :none end,
 											 doing: nil},
 						%Transition{to: :ended,
 												doing: calm_down()
@@ -270,8 +264,8 @@ defmodule Marvin.SmartThing.Behaviors do
 		fn(_percept, _state) ->
 			Logger.info("START ROAMING")
       green_lights()
-			generate_intent(:communicate, %{team: team(), info: :roaming})
-       # generate_intent(:say_curious)
+			generate_intent(:broadcast, %{info: :roaming})
+      generate_intent(:say_curious)
     end
   end
 
@@ -377,7 +371,7 @@ defmodule Marvin.SmartThing.Behaviors do
       Logger.info("START FORAGING")
       green_lights()
       generate_intent(:say_hungry)
-			generate_intent(:communicate, %{team: team(), info: :foraging})
+			generate_intent(:broadcast, %{info: :foraging})
     end
   end
 
@@ -386,7 +380,7 @@ defmodule Marvin.SmartThing.Behaviors do
       Logger.info("START TRACKING")
       green_lights()
       generate_intent(:say_tracking)
-			generate_intent(:communicate, %{team: team(), info: :tracking})
+			generate_intent(:broadcast, %{info: :tracking})
     end
   end
  
@@ -400,7 +394,7 @@ defmodule Marvin.SmartThing.Behaviors do
 									 :little -> :some
 								 end
       generate_intent(:eating_noises)
-			generate_intent(:communicate, %{team: team(), info: :eating})
+			generate_intent(:broadcast, %{info: :eating})
 			generate_intent(:eat, how_much)
 		end
 	end
@@ -410,7 +404,7 @@ defmodule Marvin.SmartThing.Behaviors do
       red_lights()
 			Logger.info("PANICKING")
       generate_intent(:say_scared)
- 			generate_intent(:communicate, %{team: team(), info: :panicking})
+ 			generate_intent(:broadcast, %{info: :panicking})
 		end
   end
 	

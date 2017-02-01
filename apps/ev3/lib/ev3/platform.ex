@@ -4,7 +4,7 @@ defmodule Marvin.Ev3.Platform do
 
 	@moduledoc "Module implementing smart thing platform_dispatch calls"
 
-	alias Marvin.Ev3.{LegoSensor, LegoMotor, LegoSound, LegoLED, Actuation}
+	alias Marvin.Ev3.{LegoSensor, LegoMotor, LegoSound, LegoLED, Actuation, InfraredSensor}
 	
 	### PlatformBehaviour
 	
@@ -77,8 +77,9 @@ defmodule Marvin.Ev3.Platform do
 		System.cmd("poweroff", [])
 	end
 
-	def thing_channel() do
-		Application.get_env(:ev3, :beacon_channel, 0)
+	def id_channel() do
+		{channel, _} = Integer.parse(System.get_env("MARVIN_ID_CHANNEL"))
+		channel
 	end
 
 	def voice() do
@@ -105,6 +106,10 @@ defmodule Marvin.Ev3.Platform do
 		Actuation.actuator_configs()
 	end
 
+	def senses_for_id_channel(channel) do
+		InfraredSensor.beacon_senses_for(channel)
+	end
+		
 	###
 
 end

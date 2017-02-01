@@ -92,17 +92,17 @@ defmodule Marvin.SmartThing.Motivation do
   @doc "Motivation to compete for food"
   def greed() do
     fn
-      (%Percept{about: :other_eating, value: %{current: true, beacon_channel: beacon_channel}}, %{motives: motives}) ->
+      (%Percept{about: :other_eating, value: %{current: true, id_channel: id_channel}}, %{motives: motives}) ->
       if latest_memory?(
             motives,
             :hunger,
             fn(value) -> value == :on end) do
-        Motive.on(:greed, %{beacon_channel: beacon_channel}) |> Motive.inhibit(:hunger)
+        Motive.on(:greed, %{id_channel: id_channel}) |> Motive.inhibit(:hunger)
 	    else
         nil
       end
-      (%Percept{about: :other_eating, value: %{current: false, beacon_channel: beacon_channel}}, _) ->
-        Motive.off(:greed, %{beacon_channel: beacon_channel})
+      (%Percept{about: :other_eating, value: %{current: false, id_channel: id_channel}}, _) ->
+        Motive.off(:greed, %{id_channel: id_channel})
 		  (_,_) ->
 				nil
     end

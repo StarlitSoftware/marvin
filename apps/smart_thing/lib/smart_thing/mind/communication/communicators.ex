@@ -28,17 +28,18 @@ defmodule Marvin.SmartThing.Communicators do
     communicator
   end
 
-	@doc "Communicate through a communicator"
-	def communicate(communicator_device, %{info: info, team: team}) do
-		apply(communicator_device.path, :communicate, [communicator_device, info, team])
+	@doc "Broadcast information to all community members via a communicator device"
+	def broadcast(communicator_device, %{info: info}) do
+		apply(communicator_device.mod, :broadcast, [communicator_device, info])
 	end
 
 	### Private
 
-  defp init_communicator(type, module) do
-    %Device{class: :comm,
-            path: module,
-            port: nil,
+  defp init_communicator(type, communicator_module) do
+    %Device{mod: communicator_module,
+						class: :comm,
+            path: "#{communicator_module}",
+            port: apply(communicator_module, :community_name, []),
             type: type
            }
   end

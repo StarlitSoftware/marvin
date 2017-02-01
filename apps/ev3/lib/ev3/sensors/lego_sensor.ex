@@ -3,7 +3,6 @@ defmodule Marvin.Ev3.LegoSensor do
 
 	require Logger
 	import Marvin.Ev3.Sysfs
-	alias Marvin.Ev3
 	alias Marvin.SmartThing.Device
 	alias Marvin.Ev3.{ColorSensor, TouchSensor, InfraredSensor, UltrasonicSensor, GyroSensor}
 

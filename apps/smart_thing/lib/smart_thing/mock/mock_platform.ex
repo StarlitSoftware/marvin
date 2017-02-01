@@ -76,8 +76,9 @@ defmodule Marvin.SmartThing.Mock.Platform do
 		System.cmd("poweroff", [])
 	end
 
-	def thing_channel() do
-		0
+	def id_channel() do
+		{channel, _} = Integer.parse(System.get_env("MARVIN_ID_CHANNEL"))
+		channel
 	end
 
 	def voice() do
@@ -102,6 +103,10 @@ defmodule Marvin.SmartThing.Mock.Platform do
 
 	def actuator_configs() do
 		Marvin.Ev3.Actuation.actuator_configs() # Use the Ev3 actuators (acutal actuators are mocked)
+	end
+
+	def senses_for_id_channel(channel) do
+		[{:beacon_heading, channel}, {:beacon_distance, channel}, {:beacon_on, channel}]
 	end
 
 	###

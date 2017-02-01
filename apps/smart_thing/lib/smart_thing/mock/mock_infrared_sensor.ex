@@ -2,7 +2,7 @@ defmodule Marvin.SmartThing.Mock.InfraredSensor do
 	@moduledoc "A mock infrared sensor"
 
 	@behaviour Marvin.SmartThing.Sensing
-  @max_beacon_channels 1 #4
+  @max_beacon_channels 4
 
 	alias Marvin.SmartThing.Device
 
@@ -17,11 +17,22 @@ defmodule Marvin.SmartThing.Mock.InfraredSensor do
 	### Sensing
 	
 	def senses(_) do
-		beacon_senses = Enum.map(1.. @max_beacon_channels, 
-							 &([{:beacon_heading, &1}, {:beacon_distance, &1}, {:beacon_on, &1}, {:remote_buttons, &1}]))
-		|> List.flatten()
+		beacon_senses = Enum.reduce(1 .. @max_beacon_channels,
+																[],
+			fn(channel, acc) ->
+				acc ++
+					[{:beacon_heading, channel},
+					 {:beacon_distance, channel},
+					 {:beacon_on, channel},
+					 {:remote_buttons, channel}]
+			end)
 		[:proximity | beacon_senses]
 	end
+
+	def beacon_senses_for(channel) do
+		[{:beacon_heading, channel}, {:beacon_distance, channel}, {:beacon_on, channel}]
+	end
+
 
 	def read(sensor, :proximity) do
 		proximity(sensor)			

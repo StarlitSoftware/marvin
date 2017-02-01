@@ -93,6 +93,11 @@ defmodule Marvin.SmartThing.CNS do
     GenServer.cast(@name, {:notify_behavior_reflexed, behavior_name, {percept_name, percept_value}})
   end
 
+	@doc "Found the id channel of another member of the community"
+	def notify_id_channel(id_channel, community_name) do
+		GenServer.cast(@name, {:notify_id_channel, id_channel, community_name})
+	end
+
   @doc "Revive from fainting"
   def notify_revive() do
     GenServer.cast(@name, :notify_revive)
@@ -204,6 +209,11 @@ defmodule Marvin.SmartThing.CNS do
     GenEvent.notify(@dispatcher, {:runtime_stats, stats})
     {:noreply, state}
   end
+
+	def handle_cast({:notify_id_channel, id_channel, community_name}, state) do
+		GenEvent.notify(@dispatcher, {:notify_id_channel, id_channel, community_name})
+		{:noreply, state}
+	end
 
 	def handle_info({:gen_event_EXIT, crashed_handler, error}, state) do
 		Logger.error("#{crashed_handler} crashed. Restarting #{__MODULE__}.")		

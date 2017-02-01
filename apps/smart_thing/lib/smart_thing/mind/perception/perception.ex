@@ -5,7 +5,7 @@ defmodule Marvin.SmartThing.Perception do
 	require Logger
 	alias Marvin.SmartThing.{PerceptorConfig, Percept}
 
-	## NOTE: Inter-robot comm generates these percepts: Percept.new(about: :heard, value: %{source: source, team: team, info: info})
+	## NOTE: Communication generates Percept.new(about: :heard, value: %{from: from_node, info: info, id_channel: id_channel, community: community_name})
 
 	@doc "Give the configurations of all perceptors to be activated"
 	def perceptor_configs() do
@@ -320,7 +320,7 @@ defmodule Marvin.SmartThing.Perception do
   @doc "Heard someone else say food and I did not find food myself and I am motivated by hunger"
   def other_eating() do
     fn
-      (%Percept{about: :heard, value: %{info: :eating, beacon_channel: beacon_channel}}, %{percepts: percepts}) ->
+      (%Percept{about: :heard, value: %{info: :eating, id_channel: id_channel}}, %{percepts: percepts}) ->
 			if not any_memory?(
 						percepts,
 						:food,
@@ -328,13 +328,14 @@ defmodule Marvin.SmartThing.Perception do
 						fn(value) -> value in [:litte, :plenty] end) do
          Logger.warn("@@@@ SOMEONE'S EATING!!! @@@@")
          Percept.new(about: :other_eating,
-                    value: %{beacon_channel: beacon_channel, current: true})
+                    value: %{id_channel: id_channel, current: true})
      else
        nil
-     end
-		  (%Percept{about: :heard, value: %{info: _info, beacon_channel: beacon_channel}}, _) ->
+			end
+			# Someone is saying something other that :eating
+		 (%Percept{about: :heard, value: %{info: _info, id_channel: id_channel}}, _) ->
         Percept.new(about: :other_eating,
-                    value: %{beacon_channel: beacon_channel, current: false})
+                    value: %{id_channel: id_channel, current: false})
 	    (_,_) -> nil
     end
   end
