@@ -16,6 +16,10 @@ defmodule Marvin.SmartThing do
     Map.get(profiles, profile_name)
 	end
 
+	def start_platform() do
+		platform_dispatch(:start)
+	end
+
 	def community_name() do
 		System.get_env("MARVIN_COMMUNITY") || "lego"
 	end
@@ -44,20 +48,20 @@ defmodule Marvin.SmartThing do
 		Communicators.communicators()
 	end
 
-	def perceptor_configs() do
-		profile_dispatch(:perceptor_configs)
+	def perception_logic() do
+		profile_dispatch(:perception_logic)
 	end
 
-	def motivator_configs() do
-		profile_dispatch(:motivator_configs)
+	def motivation_logic() do
+		profile_dispatch(:motivation_logic)
 	end
 
-	def behavior_configs() do
-		profile_dispatch(:behavior_configs)
+	def behavior_logic() do
+		profile_dispatch(:behavior_logic)
 	end
 
-	def actuator_configs() do
-		platform_dispatch(:actuator_configs)
+	def actuation_logic() do
+		platform_dispatch(:actuation_logic)
 	end
 
 	def id_channel() do

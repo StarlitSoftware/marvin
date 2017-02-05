@@ -1,5 +1,8 @@
 defmodule Marvin.SmartThing.PlatformBehaviour do
 
+	@doc "Starts the platform"
+	@callback start() :: :ok | {:error, binary}
+
 	@doc "Translates a generic device type to the platform's device type"
 	@callback mode(device_type :: atom) :: binary
 
@@ -47,5 +50,8 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 
 	@doc "Nudge the current sensed value, if appropriate"
 	@callback nudge(device :: %Marvin.SmartThing.Device{}, sense :: any, value :: any, previous_value :: any) :: any
+
+	@doc "The actuation logic as actuator configs"
+	@callback actuation_logic() :: [any]
 	
 end

@@ -11,7 +11,7 @@ defmodule Marvin.SmartThing.PerceptorsHandler do
 
 	def init(_) do
 		Logger.info("Starting #{__MODULE__}")
-		perceptor_configs = SmartThing.perceptor_configs()
+		perceptor_configs = SmartThing.perception_logic()
 		{:ok, %{perceptor_configs: perceptor_configs}}
 	end
 

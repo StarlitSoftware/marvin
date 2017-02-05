@@ -2,14 +2,14 @@ defmodule Marvin.SmartThing.ProfileBehaviour do
 
 	@moduledoc "Behaviour for a profile"
 
-	@doc "Perceptor configs"
-	@callback perceptor_configs() :: [any]
-
-	@doc "Motivator configs"
-	@callback motivator_configs() :: [any]
-
-	@doc "Behavior configs"
-	@callback behavior_configs() :: [any]
-
+	@doc "The perception logic as perceptor configs"
+	@callback perception_logic() :: [any]
+	
+	@doc "The motivation logic as motivator configs"
+	@callback motivation_logic() :: [any]
+	
+	@doc "The behavior logic as behavior configs"
+	@callback behavior_logic() :: [any]
+	
 end
 	

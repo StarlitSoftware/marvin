@@ -4,15 +4,15 @@ defmodule Marvin.Puppy.Profile do
 
 	@behaviour Marvin.SmartThing.ProfileBehaviour
 
-	def perceptor_configs() do
+	def perception_logic() do
 		Marvin.Puppy.Perception.perceptor_configs()
 	end
 
-	def motivator_configs() do
+	def motivation_logic() do
 		Marvin.Puppy.Motivation.motivator_configs()
 	end
 
-	def behavior_configs() do
+	def behavior_logic() do
 		Marvin.Puppy.Behaviors.behavior_configs()
 	end
 

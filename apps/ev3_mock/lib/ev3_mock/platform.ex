@@ -14,8 +14,17 @@ defmodule Marvin.Ev3Mock.Platform do
 												SoundPlayer
 											 }
 	alias Marvin.SmartThing.Device
+	require Logger
 	
 	### PlatformBehaviour
+
+	def start() do
+		Logger.info("Platform ev3_mock started")
+	end
+
+	def actuation_logic() do
+		Marvin.Ev3.Actuation.actuator_configs()
+	end
 	
 	def mode(_device_type) do
 		"mock"

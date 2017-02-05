@@ -8,7 +8,7 @@ defmodule Marvin.SmartThing.BehaviorsHandler do
 	
 	def init(_) do
 		Logger.info("Starting #{__MODULE__}")
-		behavior_configs = SmartThing.behavior_configs()
+		behavior_configs = SmartThing.behavior_logic()
 		{:ok, %{behavior_configs: behavior_configs}}
 	end
 

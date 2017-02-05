@@ -56,22 +56,22 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	end
 	
 	defp start_perceptors() do
-		SmartThing.perceptor_configs()
+		SmartThing.perception_logic()
 		|> Enum.each(&(PerceptorsSupervisor.start_perceptor(&1)))
 	end
 
   defp start_motivators() do
-		SmartThing.motivator_configs()
+		SmartThing.motivation_logic()
 		|> Enum.each(&(MotivatorsSupervisor.start_motivator(&1)))
 	end
 
   defp start_behaviors() do
-		SmartThing.behavior_configs()
+		SmartThing.behavior_logic()
 		|> Enum.each(&(BehaviorsSupervisor.start_behavior(&1)))
 	end
 
   defp start_actuators() do
-		SmartThing.actuator_configs() # dispatches to platform
+		SmartThing.actuation_logic() # dispatches to platform
 		|> Enum.each(&(ActuatorsSupervisor.start_actuator(&1)))
 	end
   

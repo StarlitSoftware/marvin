@@ -33,9 +33,9 @@ defmodule Marvin.SmartThing.Attention do
 		sensing_devices = SmartThing.sensors() ++ SmartThing.motors()
     {:ok, %{# static
 				    sensing_devices: sensing_devices,
-						motivator_configs: SmartThing.motivator_configs(),
-						behavior_configs: SmartThing.behavior_configs(),
-						perceptor_configs: SmartThing.perceptor_configs(),
+						motivator_configs: SmartThing.motivation_logic(),
+						behavior_configs: SmartThing.behavior_logic(),
+						perceptor_configs: SmartThing.perception_logic(),
 						communicators: Communicators.communicators(),
 						detected_senses: detected_senses(sensing_devices),
 						# dynamic

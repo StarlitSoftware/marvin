@@ -13,6 +13,7 @@ defmodule Marvin.SmartThing.Application do
   # for more information on OTP Applications
   def start(_type, _args) do
 		Logger.info("Starting #{__MODULE__}")
+		SmartThing.start_platform()
 		connect_to_nodes()
     children = [
 			supervisor(SmartThingSupervisor, [])

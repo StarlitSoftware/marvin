@@ -9,7 +9,7 @@ defmodule Marvin.SmartThing.ActuatorsHandler do
 
 	def init(_) do
 		Logger.info("Starting #{__MODULE__}")
-		actuator_configs = SmartThing.actuator_configs() # dispatches to platform
+		actuator_configs = SmartThing.actuation_logic() # dispatches to platform
 		{:ok, %{actuator_configs: actuator_configs}}
 	end
 

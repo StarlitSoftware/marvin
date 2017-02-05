@@ -8,7 +8,7 @@ defmodule Marvin.SmartThing.MotivatorsHandler do
 	
 	def init(_) do
 		Logger.info("Starting #{__MODULE__}")
-		motivator_configs = SmartThing.motivator_configs()
+		motivator_configs = SmartThing.motivation_logic()
 		{:ok, %{motivator_configs: motivator_configs}}
 	end
 
