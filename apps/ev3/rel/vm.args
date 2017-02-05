@@ -1,4 +1,14 @@
-## Start the Elixir shell
+## Name of the node
+-sname marv
+# -sname rodney
+
+## Cookie for distributed erlang
+-setcookie minsky
+
 -noshell
--user Elixir.IEx.CLI
+# Comment this next line to get an iex prompt
+#-user Elixir.IEx.CLI
+# Comment this next line in to suppress the console
+-noinput +Bd
 -extra --no-halt
+

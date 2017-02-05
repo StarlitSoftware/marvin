@@ -2,6 +2,7 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
 # file won't be loaded nor affect the parent project. For this reason,
@@ -30,22 +31,22 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 
 # Configures Elixir's Logger
-config :logger, level: :info
+config :logger,
+level: :info
 # backends: [{LoggerFileBackend, :log}]
 
 config :logger, :log,
-path: "/mnt/ev3.log",
+level: :info,
+path: (if (System.get_env("MARVIN_PLATFORM") || "mock_ev3") == "ev3", do: "/mnt/ev3.log", else: "ev3.log"),
 format: "$time $metadata[$level] $message\n",
 metadata: [:request_id]
 
 config :smart_thing,
-mock: true,
-mock_platform: Marvin.SmartThing.Mock.Platform,
-platform: Marvin.SmartThing.Ev3.Platform,
-display: Marvin.SmartThing.Ev3.Display,
-community: :lego,
-nodes: [:"thing_one@ukemi", :"thing_two@ukemi"]
+platforms: %{"mock_ev3" => Marvin.Ev3Mock.Platform,
+						 "ev3" => Marvin.Ev3.Platform,
+						 "hub" => Marvin.Hub.Platform},
+profiles: %{"puppy" => Marvin.Puppy.Profile,
+						"mommy" => Marvin.Mommy.Profile}
 
-# import_config "nerves.exs"
 
 # import_config "#{Mix.env}.exs"

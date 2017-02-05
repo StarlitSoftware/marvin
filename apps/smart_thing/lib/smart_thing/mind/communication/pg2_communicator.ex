@@ -30,30 +30,30 @@ defmodule Marvin.SmartThing.PG2Communicator do
 		GenServer.cast(to_node, {:communication, Node.self(), info, id_channel, community_name})
 	end
 	
-  @doc "Get community name"
-	def community_name() do
-		Application.get_env(:smart_thing, :community)
-	end
-
 	def senses_awakened_by(sense) do
 		GenServer.call(@name, {:senses_awakened_by, sense})
+	end
+
+	def port() do
+		SmartThing.community_name()
 	end
 	
 	### CALLBACK
 
 	def init([]) do
-		group = community_name() # the pg2 group is the community's name
+		group = SmartThing.community_name() # the pg2 group is the community's name
 		{:ok, _pid} = :pg2.start()
 		:ok = :pg2.create(group)
 		:ok = :pg2.join(group, self())
 		Logger.info("Joined community #{group}")
-		{:ok, %{group: group, id_channels: []}}
+		{:ok, %{group: group, id_channels: [], community_name: group}}
 	end
 
-	def handle_cast({:broadcast, info}, %{group: group} = state) do
+	def handle_cast({:broadcast, info},
+									%{group: group,
+										community_name: community_name} = state) do
 		members = :pg2.get_members(group)
 		Logger.info("COMMUNICATOR #{inspect Node.self()} broadcasting #{inspect info} to #{inspect Node.list()}")
-		community_name = community_name()
 		members
 		|> Enum.each(&(remote_send(&1, info, community_name)))
 		{:noreply, state}

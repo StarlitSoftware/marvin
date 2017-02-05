@@ -39,7 +39,7 @@ defmodule Marvin.SmartThing.Communicators do
     %Device{mod: communicator_module,
 						class: :comm,
             path: "#{communicator_module}",
-            port: apply(communicator_module, :community_name, []),
+            port: apply(communicator_module, :port, []),
             type: type
            }
   end

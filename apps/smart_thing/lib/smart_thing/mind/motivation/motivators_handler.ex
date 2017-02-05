@@ -3,11 +3,12 @@ defmodule Marvin.SmartThing.MotivatorsHandler do
 	
 	require Logger
 	use GenEvent
-	alias Marvin.SmartThing.{Motive, Motivation, Motivator, CNS, Percept}
+	alias Marvin.SmartThing.{Motive, Motivator, CNS, Percept}
+	alias Marvin.SmartThing
 	
 	def init(_) do
 		Logger.info("Starting #{__MODULE__}")
-		motivator_configs = Motivation.motivator_configs()
+		motivator_configs = SmartThing.motivator_configs()
 		{:ok, %{motivator_configs: motivator_configs}}
 	end
 

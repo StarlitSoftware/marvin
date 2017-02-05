@@ -3,7 +3,7 @@ defmodule Marvin.SmartThing.Attention do
 	@moduledoc "Responsible for attention. On each clock tick, polls only the sensors that senses what matters here and now, unless already in the midst of a polling run."
 
 	require Logger
-	alias Marvin.SmartThing.{Device, Detector, Communicators, Motivation, Behaviors, Perception, Memory}
+	alias Marvin.SmartThing.{Device, Detector, Communicators, Memory}
 	alias Marvin.SmartThing
 
 	@name __MODULE__
@@ -33,9 +33,9 @@ defmodule Marvin.SmartThing.Attention do
 		sensing_devices = SmartThing.sensors() ++ SmartThing.motors()
     {:ok, %{# static
 				    sensing_devices: sensing_devices,
-						motivator_configs: Motivation.motivator_configs(),
-						behavior_configs: Behaviors.behavior_configs(),
-						perceptor_configs: Perception.perceptor_configs(),
+						motivator_configs: SmartThing.motivator_configs(),
+						behavior_configs: SmartThing.behavior_configs(),
+						perceptor_configs: SmartThing.perceptor_configs(),
 						communicators: Communicators.communicators(),
 						detected_senses: detected_senses(sensing_devices),
 						# dynamic

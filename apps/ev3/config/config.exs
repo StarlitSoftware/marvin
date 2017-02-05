@@ -15,9 +15,18 @@ use Mix.Config
 # of this file so it overrides the configuration defined above.
 # import_config "#{Mix.env}.exs"
 
-config :ev3,
-beacon_channel: 2,
-voice: "en-sc",
-nodes: []
+config :nerves, :firmware,
+  fwup_conf: "config/fwup.conf",
+  rootfs_additions: "config/rootfs-additions"
+
+# if unset, the default regulatory domain is the world domain, "00"
+config :nerves_interim_wifi,
+  regulatory_domain: "US"
+
+# Change these options to your
+config :ev3, :wlan0,
+  ssid: "cloutiernewman",
+  key_mgmt: :"WPA-PSK",
+  psk: "peaksisland5725"
 
 

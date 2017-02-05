@@ -4,13 +4,14 @@ defmodule Marvin.SmartThing.PerceptorsHandler do
 	use GenEvent
 	require Logger
 
-	alias Marvin.SmartThing.{Perceptor, CNS, Perception, Percept}
-
+	alias Marvin.SmartThing.{Perceptor, CNS, Percept}
+	alias Marvin.SmartThing
+	
 	### Callbacks
 
 	def init(_) do
 		Logger.info("Starting #{__MODULE__}")
-		perceptor_configs = Perception.perceptor_configs()
+		perceptor_configs = SmartThing.perceptor_configs()
 		{:ok, %{perceptor_configs: perceptor_configs}}
 	end
 

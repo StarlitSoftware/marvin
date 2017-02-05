@@ -3,7 +3,7 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	use Supervisor
 	require Logger
 	alias Marvin.SmartThing
-	alias Marvin.SmartThing.{CNS, Attention, Memory, DetectorsSupervisor, PerceptorsSupervisor, Perception, MotivatorsSupervisor, BehaviorsSupervisor, ActuatorsSupervisor, Motivation, Behaviors, InternalClock, PG2Communicator}
+	alias Marvin.SmartThing.{CNS, Attention, Memory, DetectorsSupervisor, PerceptorsSupervisor, MotivatorsSupervisor, BehaviorsSupervisor, ActuatorsSupervisor, InternalClock, PG2Communicator}
 
 	@name __MODULE__
 
@@ -20,9 +20,9 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 		children = [	
 		 	worker(CNS, []),
 		 	worker(Memory, []),
+		 	worker(PG2Communicator, []),
 			worker(Attention, []),
 			worker(InternalClock, []),
-		 	worker(PG2Communicator, []),
 			supervisor(DetectorsSupervisor, []),
 		 	supervisor(ActuatorsSupervisor, []),
 		 	supervisor(BehaviorsSupervisor, []),
@@ -56,17 +56,17 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	end
 	
 	defp start_perceptors() do
-		Perception.perceptor_configs()
+		SmartThing.perceptor_configs()
 		|> Enum.each(&(PerceptorsSupervisor.start_perceptor(&1)))
 	end
 
   defp start_motivators() do
-		Motivation.motivator_configs()
+		SmartThing.motivator_configs()
 		|> Enum.each(&(MotivatorsSupervisor.start_motivator(&1)))
 	end
 
   defp start_behaviors() do
-		Behaviors.behavior_configs()
+		SmartThing.behavior_configs()
 		|> Enum.each(&(BehaviorsSupervisor.start_behavior(&1)))
 	end
 

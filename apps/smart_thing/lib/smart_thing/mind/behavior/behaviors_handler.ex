@@ -3,11 +3,12 @@ defmodule Marvin.SmartThing.BehaviorsHandler do
 	
 	require Logger
 	use GenEvent
-	alias Marvin.SmartThing.{Behavior, Behaviors, Percept}
-
+	alias Marvin.SmartThing.{Behavior, Percept}
+	alias Marvin.SmartThing
+	
 	def init(_) do
 		Logger.info("Starting #{__MODULE__}")
-		behavior_configs = Behaviors.behavior_configs()
+		behavior_configs = SmartThing.behavior_configs()
 		{:ok, %{behavior_configs: behavior_configs}}
 	end
 

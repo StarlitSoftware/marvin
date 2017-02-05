@@ -6,12 +6,6 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 	@doc "Translates a generic device code to the platform's device code"
   @callback device_code(device_type :: atom) :: binary
 
-	@doc "Loads the platform's OS modules"
-  @callback load_nerves_os_modules() :: any
-
-	@doc "Gives a list of node names"
-	@callback nodes() :: any
-
 	@doc "Gives a list of connected sensor devices"
 	@callback sensors() :: [%Marvin.SmartThing.Device{}]
 
@@ -48,10 +42,10 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 	@doc "Get a motor's sensitivity for a sense"
 	@callback motor_sensitivity(device :: %Marvin.SmartThing.Device{}, sense :: any) :: any
 
-	@doc "Get the actuator configurations"
-	@callback actuator_configs() :: any
-
 	@doc "Get a list of senses associated with a smart thing's id channel"
   @callback senses_for_id_channel(id_channel :: binary) :: [any]
+
+	@doc "Nudge the current sensed value, if appropriate"
+	@callback nudge(device :: %Marvin.SmartThing.Device{}, sense :: any, value :: any, previous_value :: any) :: any
 	
 end

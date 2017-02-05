@@ -3,7 +3,6 @@ defmodule Marvin.SmartThing.Detector do
 
 	require Logger
   alias Marvin.SmartThing.{Percept, CNS, Device}
-	alias Marvin.SmartThing.Mock
 	import Marvin.SmartThing.Utils, only: [platform_dispatch: 2]
 
 	@ttl 10_000 # detected percept is retained for 10 secs # TODO set in config
@@ -25,25 +24,21 @@ defmodule Marvin.SmartThing.Detector do
 			name,
 			fn(state) ->
   			{value, updated_device} = read(state.device, sense)
-				  if value != nil do
-					  percept = if updated_device.mock do
-                        previous_value = Map.get(state.previous_values, sense, nil)
-                        mocked_value = Mock.Platform.nudge(updated_device, sense, value, previous_value)
-                        Percept.new(about: sense, value: mocked_value)
-                      else
-                        Percept.new(about: sense, value: value)
-                      end
-            %Percept{percept |
-										 source: name,
-										 ttl: @ttl,
-										 resolution: sensitivity(updated_device, sense)}
-					  |> CNS.notify_perceived()
-					  {:ok, %{state |
-									  device: updated_device,
-                    previous_values: Map.put(state.previous_values, sense, percept.value)}}
-				  else
-					  {:ok, %{state | device: updated_device}}
-				  end
+				if value != nil do
+					previous_value = Map.get(state.previous_values, sense, nil)
+          nudged_value = platform_dispatch(:nudge, [updated_device, sense, value, previous_value])
+          percept = Percept.new(about: sense, value: nudged_value)
+          %Percept{percept |
+									 source: name,
+									 ttl: @ttl,
+									 resolution: sensitivity(updated_device, sense)}
+					|> CNS.notify_perceived()
+					{:ok, %{state |
+									device: updated_device,
+                  previous_values: Map.put(state.previous_values, sense, percept.value)}}
+				else
+					{:ok, %{state | device: updated_device}}
+				end
 			end)
 		:ok
 	end

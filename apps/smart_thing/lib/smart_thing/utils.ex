@@ -34,6 +34,14 @@ defmodule Marvin.SmartThing.Utils do
 		apply(SmartThing.platform(), fn_name, args)
 	end
 
+	def profile_dispatch(fn_name) do
+		profile_dispatch(fn_name, [])
+	end
+	
+	def profile_dispatch(fn_name, args) do
+		apply(SmartThing.profile(), fn_name, args)
+	end
+
 	def get_voice() do
 		platform_dispatch(:voice)
 	end

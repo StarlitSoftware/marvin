@@ -1,0 +1,22 @@
+# See http://lechnology.com/2014/09/using-uart-sensors-on-any-linux/
+
+SUBSYSTEM=="lego", KERNEL=="in4:ev3-uart-host", ACTION=="add", \
+    RUN+="/usr/sbin/ev3uartattach start ttySU0"
+SUBSYSTEM=="lego", KERNEL=="in4:ev3-uart-host", ACTION=="remove", \
+    RUN+="/usr/sbin/ev3uartattach stop ttySU0"
+
+SUBSYSTEM=="lego", KERNEL=="in3:ev3-uart-host", ACTION=="add", \
+    RUN+="/usr/sbin/ev3uartattach start ttySU1"
+SUBSYSTEM=="lego", KERNEL=="in3:ev3-uart-host", ACTION=="remove", \
+    RUN+="/usr/sbin/ev3uartattach stop ttySU1"
+
+SUBSYSTEM=="lego", KERNEL=="in2:ev3-uart-host", ACTION=="add", \
+    RUN+="/usr/sbin/ev3uartattach start ttyS0"
+SUBSYSTEM=="lego", KERNEL=="in2:ev3-uart-host", ACTION=="remove", \
+    RUN+="/usr/sbin/ev3uartattach stop ttyS0"
+
+SUBSYSTEM=="lego", KERNEL=="in1:ev3-uart-host", ACTION=="add", \
+    RUN+="/usr/sbin/ev3uartattach start ttyS1"
+SUBSYSTEM=="lego", KERNEL=="in1:ev3-uart-host", ACTION=="remove", \
+    RUN+="/usr/sbin/ev3uartattach stop ttyS1"
+

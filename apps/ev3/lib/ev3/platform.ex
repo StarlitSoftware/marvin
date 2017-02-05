@@ -4,7 +4,7 @@ defmodule Marvin.Ev3.Platform do
 
 	@moduledoc "Module implementing smart thing platform_dispatch calls"
 
-	alias Marvin.Ev3.{LegoSensor, LegoMotor, LegoSound, LegoLED, Actuation, InfraredSensor}
+	alias Marvin.Ev3.{LegoSensor, LegoMotor, LegoSound, LegoLED, InfraredSensor}
 	
 	### PlatformBehaviour
 	
@@ -31,22 +31,6 @@ defmodule Marvin.Ev3.Platform do
       :medium -> "lego-ev3-m-motor"
     end
   end
-
-  def load_nerves_os_modules() do
-		System.cmd("/sbin/udevd", ["--daemon"])
-		Process.sleep(1000)  # I do not like this line
-    System.cmd("modprobe", ["suart_emu"])
-
-    # Port 1 may be disabled -> see rootfs-additions/etc/modprobe.d
-    System.cmd("modprobe", ["legoev3_ports"])
-    System.cmd("modprobe", ["snd_legoev3"])
-    System.cmd("modprobe", ["legoev3_battery"])
-		System.cmd("modprobe", ["ev3_uart_sensor_ld"])
-  end
-
-	def nodes() do
-		Application.get_env(:ev3, :nodes)
-	end
 
 	def device_manager(type) do
 		case type do
@@ -102,12 +86,12 @@ defmodule Marvin.Ev3.Platform do
 		LegoMotor.sensitivity(device, sense)
 	end
 
-	def actuator_configs() do
-		Actuation.actuator_configs()
-	end
-
 	def senses_for_id_channel(channel) do
 		InfraredSensor.beacon_senses_for(channel)
+	end
+
+	def nudge(_device, _sense, value, _previous_value) do
+		value
 	end
 		
 	###
