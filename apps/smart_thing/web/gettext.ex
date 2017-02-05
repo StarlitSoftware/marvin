@@ -1,11 +1,11 @@
-defmodule Hub.Gettext do
+defmodule SmartThing.Gettext do
   @moduledoc """
   A module providing Internationalization with a gettext-based API.
 
   By using [Gettext](http://hexdocs.pm/gettext),
   your module gains a set of macros for translations, for example:
 
-      import Hub.Gettext
+      import SmartThing.Gettext
 
       # Simple translation
       gettext "Here is the string to translate"
@@ -20,5 +20,5 @@ defmodule Hub.Gettext do
 
   See the [Gettext Docs](http://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :hub
+  use Gettext, otp_app: :smart_thing
 end

@@ -3,11 +3,11 @@ defmodule Marvin.SmartThing.Communicators do
 
 	require Logger
 	alias Marvin.SmartThing.Device
-	alias Marvin.SmartThing.PG2Communicator
+	alias Marvin.SmartThing.{PG2Communicator, RESTCommunicator}
 
 	@doc "Get all available communicator"
   def communicators() do
-		[:pg2]
+		[:pg2, :rest]
 		|> Enum.map(&(init_communicator("#{&1}", module_for(&1))))
 	end
 
@@ -47,6 +47,7 @@ defmodule Marvin.SmartThing.Communicators do
 	defp module_for(type) do
 		case type do
 			:pg2 -> PG2Communicator
+			:rest -> RESTCommunicator
 		  other ->
 				error = "Unknown type #{other} of communicator"
 				Logger.error(error)

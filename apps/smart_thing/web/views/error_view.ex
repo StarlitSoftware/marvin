@@ -1,5 +1,5 @@
-defmodule Hub.ErrorView do
-  use Hub.Web, :view
+defmodule SmartThing.ErrorView do
+  use SmartThing.Web, :view
 
   def render("404.html", _assigns) do
     "Page not found"

@@ -24,7 +24,17 @@ defmodule Marvin.SmartThing.Percept do
 															 value: value}
 	end
 
-	@doc "Create a new percept with sense, value set"
+	@doc "Create a new percept with sense, value and source set"
+	def new(about: sense, value: value, source: source) do
+		msecs = now()
+		%Marvin.SmartThing.Percept{about: sense,
+															 since: msecs,
+															 until: msecs,
+															 value: value,
+															 source: source}
+	end
+
+	@doc "Create a new transient percept with sense, value set"
 	def new_transient(about: sense, value: value) do
 		msecs = now()
 		%Marvin.SmartThing.Percept{about: sense,
@@ -61,7 +71,7 @@ defmodule Marvin.SmartThing.Percept do
 	def same?(percept1, percept2) do
 		percept1.about == percept2.about
 		and percept1.value == percept2.value
-		and percept1.source == percept2.source
+		and same_source?(percept1.source, percept2.source)
 	end
 
   @doc "The age of the percept"
@@ -77,6 +87,16 @@ defmodule Marvin.SmartThing.Percept do
 			sense when is_atom(sense)
 				-> sense
 		end
+	end
+
+	### PRIVATE
+
+	defp same_source?(source1, source2) when is_map(source1) and is_map(source2) do
+		Map.equal?(source1, source2)
+	end
+
+	defp same_source?(source1, source2) do
+		source1 == source2
 	end
 
   # about, since and value are required for the percept to be memorable

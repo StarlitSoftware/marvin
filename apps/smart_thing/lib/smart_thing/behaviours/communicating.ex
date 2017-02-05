@@ -8,8 +8,8 @@ defmodule Marvin.SmartThing.Communicating do
 	@doc "Broadcast info to all other smart things in the community"
 	@callback broadcast(device :: %Device{}, info :: any) :: any
 
-	@doc "Send info to a community member"
-	@callback remote_send(to_node :: node(), info :: any, community_name :: binary) :: any
+	@doc "Send a percept to a member of the parent community"
+	@callback report_up(device :: %Device{}, about :: any, value :: any) :: any
 
 	@doc "The senses that become attended to when a given sense is also attended to"
 	@callback senses_awakened_by(sense :: any) :: [any]

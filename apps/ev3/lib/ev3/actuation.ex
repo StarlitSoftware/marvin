@@ -80,11 +80,14 @@ defmodule Marvin.Ev3.Actuation do
       ActuatorConfig.new(name: :communicators,
 												 type: :comm,
 												 specs: [
-													 %CommSpec{name: :comms, type: :pg2} # could set props.ttl to something other than 30 secs default
+													 %CommSpec{name: :local, type: :pg2},
+													 %CommSpec{name: :remote, type: :rest}
 												 ],
 												 activations: [
 													 %Activation{intent: :broadcast, # intent value = %{info: info}
-																			 action: broadcast()}
+																			 action: broadcast()},
+													 %Activation{intent: :report, 
+																			 action: report()}
 												 ])													 
 		]
 	end
@@ -273,8 +276,15 @@ defmodule Marvin.Ev3.Actuation do
 	defp broadcast() do
 		fn(intent, communicators) ->
 			Script.new(:broadcast, communicators)
-			|> Script.add_step(:comms, :broadcast, [intent.value])
+			|> Script.add_step(:local, :broadcast, [intent.value])
 		end
 	end
   
+	defp report() do
+		fn(intent, communicators) ->
+			Script.new(:report, communicators)
+			|> Script.add_step(:remote, :report_up, ["report", intent.value])
+		end
+	end
+
 end

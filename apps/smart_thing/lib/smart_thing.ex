@@ -24,6 +24,22 @@ defmodule Marvin.SmartThing do
 		System.get_env("MARVIN_COMMUNITY") || "lego"
 	end
 
+	def rest_port() do
+		Application.get_env(:smart_thing, :http) |> Keyword.get(:port)
+	end
+
+	def rest_host() do
+		Application.get_env(:smart_thing, :url) |> Keyword.get(:host)
+	end
+
+	def rest_source() do
+		"http://#{rest_host()}:#{rest_port()}/marvin"
+	end
+
+	def member_name() do
+		Node.self()
+	end
+
 	def peer() do
 		(System.get_env("MARVIN_PEER") || "???") |> String.to_atom()
 	end

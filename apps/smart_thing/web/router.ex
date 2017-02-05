@@ -1,5 +1,5 @@
-defmodule Hub.Router do
-  use Hub.Web, :router
+defmodule SmartThing.Router do
+  use SmartThing.Web, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -13,14 +13,20 @@ defmodule Hub.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", Hub do
+  scope "/", SmartThing do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
   end
 
+  scope "/api", SmartThing do
+    pipe_through :api
+
+    post "/marvin/percept", PerceptionController, :handle_percept
+  end
+
   # Other scopes may use custom stacks.
-  # scope "/api", Hub do
+  # scope "/api", SmartThing do
   #   pipe_through :api
   # end
 end

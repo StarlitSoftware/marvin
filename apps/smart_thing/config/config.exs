@@ -30,7 +30,17 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
-# Configures Elixir's Logger
+# Configures the endpoint
+config :smart_thing, SmartThing.Endpoint,
+url: [host: "localhost"],
+http: [port: (System.get_env("MARVIN_PORT") || 4000)],
+root: Path.dirname(__DIR__),
+secret_key_base: "BtqMSrya4yeaCROpSicDZyFSgm+BRcaMaegBORz1SK/oQT811zd4IBnsxg1HLsCn",
+render_errors: [accepts: ~w(html json)],
+pubsub: [name: Hub.PubSub,
+         adapter: Phoenix.PubSub.PG2]
+
+	# Configures Elixir's Logger
 config :logger,
 level: :info
 # backends: [{LoggerFileBackend, :log}]

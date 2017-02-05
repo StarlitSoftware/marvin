@@ -1,12 +1,12 @@
-defmodule Hub.Web do
+defmodule SmartThing.Web do
   @moduledoc """
   A module that keeps using definitions for controllers,
   views and so on.
 
   This can be used in your application as:
 
-      use Hub.Web, :controller
-      use Hub.Web, :view
+      use SmartThing.Web, :controller
+      use SmartThing.Web, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -26,8 +26,8 @@ defmodule Hub.Web do
     quote do
       use Phoenix.Controller
 
-      import Hub.Router.Helpers
-      import Hub.Gettext
+      import SmartThing.Router.Helpers
+      import SmartThing.Gettext
     end
   end
 
@@ -41,9 +41,9 @@ defmodule Hub.Web do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      import Hub.Router.Helpers
-      import Hub.ErrorHelpers
-      import Hub.Gettext
+      import SmartThing.Router.Helpers
+      import SmartThing.ErrorHelpers
+      import SmartThing.Gettext
     end
   end
 
@@ -56,7 +56,7 @@ defmodule Hub.Web do
   def channel do
     quote do
       use Phoenix.Channel
-      import Hub.Gettext
+      import SmartThing.Gettext
     end
   end
 

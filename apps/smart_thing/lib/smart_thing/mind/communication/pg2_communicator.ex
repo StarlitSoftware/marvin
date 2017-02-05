@@ -24,12 +24,11 @@ defmodule Marvin.SmartThing.PG2Communicator do
 		GenServer.cast(@name, {:broadcast, info})
 	end
 
-	@doc "Send info to a community member"
-	def remote_send(to_node, info, community_name) do
-    id_channel = SmartThing.id_channel() # how to sense the sender
-		GenServer.cast(to_node, {:communication, Node.self(), info, id_channel, community_name})
+	@doc "Report up to a member of the parent community"
+	def report_up(_device, _about, _value) do
+		Logger.warn("Report up not implemented by #{@name}")
 	end
-	
+
 	def senses_awakened_by(sense) do
 		GenServer.call(@name, {:senses_awakened_by, sense})
 	end
@@ -55,7 +54,7 @@ defmodule Marvin.SmartThing.PG2Communicator do
 		members = :pg2.get_members(group)
 		Logger.info("COMMUNICATOR #{inspect Node.self()} broadcasting #{inspect info} to #{inspect Node.list()}")
 		members
-		|> Enum.each(&(remote_send(&1, info, community_name)))
+		|> Enum.each(&(send_to_peer(&1, info, community_name)))
 		{:noreply, state}
 	end
 
@@ -89,4 +88,11 @@ defmodule Marvin.SmartThing.PG2Communicator do
 		{:reply, senses, state}
 	end
 
+	### PRIVATE
+	
+	defp send_to_peer(to_node, info, community_name) do
+    id_channel = SmartThing.id_channel() # how to sense the sender
+		GenServer.cast(to_node, {:communication, Node.self(), info, id_channel, community_name})
+	end
+	
 end	
