@@ -4,7 +4,6 @@ defmodule Marvin.SmartThing.Application do
   use Application
   require Logger
 	alias Marvin.SmartThing.{SmartThingSupervisor, CNS, InternalClock}
-	alias Marvin.SmartThing
   import Supervisor.Spec, warn: false
 
   @poll_runtime_delay 5000
@@ -13,9 +12,10 @@ defmodule Marvin.SmartThing.Application do
   # for more information on OTP Applications
   def start(_type, _args) do
 		Logger.info("Starting #{__MODULE__}")
-		SmartThing.start_platform()
+		Marvin.SmartThing.start_platform()
 		connect_to_nodes()
     children = [
+			supervisor(SmartThing.Endpoint, []),
 			supervisor(SmartThingSupervisor, [])
     ]
     opts = [strategy: :one_for_one, name: :root_supervisor]
@@ -56,7 +56,7 @@ defmodule Marvin.SmartThing.Application do
   ### Private
 
 	defp connect_to_nodes() do
-		Node.connect(SmartThing.peer()) # join the peer network
+		Node.connect(Marvin.SmartThing.peer()) # join the peer network
 		Logger.warn("#{Node.self()} is connected to #{inspect Node.list()}")
 	end
 

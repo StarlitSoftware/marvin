@@ -9,9 +9,9 @@ OS variables:
 * MARVIN_PEER -- defaults to ???
 * MARVIN_MOTHER -- not supported yet
 
-MARVIN_PLATFORM=mock_ev3 MARVIN_PROFILE=puppy MARVIN_PEER=rodney@ukemi iex MARVIN_PORT=4000 --sname marv -S mix phoenix.server
+MARVIN_PLATFORM=mock_ev3 MARVIN_PROFILE=puppy MARVIN_PEER=rodney@ukemi MARVIN_PORT=4001 MARVIN_PARENT_URL=localhost:4002 iex --sname marv -S mix phoenix.server
 
-MARVIN_PLATFORM=mock_ev3 MARVIN_PROFILE=puppy MARVIN_PEER=marv@ukemi iex MARVIN_PORT=4001 --sname rodney -S mix phoenix.server
+MARVIN_PLATFORM=mock_ev3 MARVIN_PROFILE=puppy MARVIN_PEER=marv@ukemi MARVIN_PORT=4002 MARVIN_PARENT_URL=localhost:4001 iex  --sname rodney -S mix phoenix.server
 
 -----------------
 

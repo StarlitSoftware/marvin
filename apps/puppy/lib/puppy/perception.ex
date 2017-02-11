@@ -302,7 +302,7 @@ defmodule Marvin.Puppy.Perception do
   @doc "Heard panic from someone else (and I did not recently say danger)"
   def other_panicking() do
     fn
-      (%Percept{about: :heard, value: %{info: :panicking}}, %{intents: intents}) ->
+      (%Percept{about: :heard, value: %{info: %{feeling: :panic}}}, %{intents: intents}) ->
 				if not any_memory?(
 							intents,
 							:say_scared,
@@ -320,7 +320,7 @@ defmodule Marvin.Puppy.Perception do
   @doc "Heard someone else say food and I did not find food myself and I am motivated by hunger"
   def other_eating() do
     fn
-      (%Percept{about: :heard, value: %{info: :eating, id_channel: id_channel}}, %{percepts: percepts}) ->
+      (%Percept{about: :heard, value: %{info: %{doing: :eating}, id_channel: id_channel}}, %{percepts: percepts}) ->
 			if not any_memory?(
 						percepts,
 						:food,
@@ -332,10 +332,6 @@ defmodule Marvin.Puppy.Perception do
      else
        nil
 			end
-			# Someone is saying something other that :eating
-		 (%Percept{about: :heard, value: %{info: _info, id_channel: id_channel}}, _) ->
-        Percept.new(about: :other_eating,
-                    value: %{id_channel: id_channel, current: false})
 	    (_,_) -> nil
     end
   end

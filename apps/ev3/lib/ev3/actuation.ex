@@ -87,7 +87,7 @@ defmodule Marvin.Ev3.Actuation do
 													 %Activation{intent: :broadcast, # intent value = %{info: info}
 																			 action: broadcast()},
 													 %Activation{intent: :report, 
-																			 action: report()}
+																			 action: report()}  # intent value = %{info: info}
 												 ])													 
 		]
 	end
@@ -283,7 +283,7 @@ defmodule Marvin.Ev3.Actuation do
 	defp report() do
 		fn(intent, communicators) ->
 			Script.new(:report, communicators)
-			|> Script.add_step(:remote, :report_up, ["report", intent.value])
+			|> Script.add_step(:remote, :send_percept, [:report, intent.value])
 		end
 	end
 

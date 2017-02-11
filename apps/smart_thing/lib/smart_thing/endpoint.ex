@@ -1,14 +1,14 @@
-defmodule Panel.Endpoint do
-  use Phoenix.Endpoint, otp_app: :panel
+defmodule SmartThing.Endpoint do
+  use Phoenix.Endpoint, otp_app: :smart_thing
 
-  socket "/socket", Panel.UserSocket
+  socket "/socket", SmartThing.UserSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phoenix.digest
   # when deploying your static files in production.
   plug Plug.Static,
-    at: "/", from: :panel, gzip: false,
+    at: "/", from: :smart_thing, gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
   # Code reloading can be explicitly enabled under the
@@ -32,8 +32,8 @@ defmodule Panel.Endpoint do
 
   plug Plug.Session,
     store: :cookie,
-    key: "_panel_key",
-    signing_salt: "fQdhWQ1G"
+    key: "_smart_thing_key",
+    signing_salt: "+w6FlehT"
 
-  plug Panel.Router
+  plug SmartThing.Router
 end

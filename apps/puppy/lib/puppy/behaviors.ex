@@ -264,7 +264,8 @@ defmodule Marvin.Puppy.Behaviors do
 		fn(_percept, _state) ->
 			Logger.info("START ROAMING")
       green_lights()
-			generate_intent(:broadcast, %{info: :roaming})
+			generate_intent(:broadcast, %{doing: :roaming})
+			generate_intent(:report, %{doing: :roaming})
       generate_intent(:say_curious)
     end
   end
@@ -371,7 +372,8 @@ defmodule Marvin.Puppy.Behaviors do
       Logger.info("START FORAGING")
       green_lights()
       generate_intent(:say_hungry)
-			generate_intent(:broadcast, %{info: :foraging})
+			generate_intent(:broadcast, %{doing: :foraging})
+			generate_intent(:report, %{doing: :foraging})
     end
   end
 
@@ -380,7 +382,8 @@ defmodule Marvin.Puppy.Behaviors do
       Logger.info("START TRACKING")
       green_lights()
       generate_intent(:say_tracking)
-			generate_intent(:broadcast, %{info: :tracking})
+			generate_intent(:broadcast, %{doing: :tracking})
+			generate_intent(:report, %{doing: :tracking})
     end
   end
  
@@ -394,7 +397,8 @@ defmodule Marvin.Puppy.Behaviors do
 									 :little -> :some
 								 end
       generate_intent(:eating_noises)
-			generate_intent(:broadcast, %{info: :eating})
+			generate_intent(:broadcast, %{doing: :eating})
+			generate_intent(:report, %{doing: :eating})
 			generate_intent(:eat, how_much)
 		end
 	end
@@ -404,7 +408,8 @@ defmodule Marvin.Puppy.Behaviors do
       red_lights()
 			Logger.info("PANICKING")
       generate_intent(:say_scared)
- 			generate_intent(:broadcast, %{info: :panicking})
+ 			generate_intent(:broadcast, %{feeling: :panic})
+ 			generate_intent(:report, %{feeling: :panic})
 		end
   end
 	
@@ -423,11 +428,24 @@ defmodule Marvin.Puppy.Behaviors do
 	end
 
 	defp confirming_heard() do
-		fn(percept, _state) ->
-			%{info: info} = percept.value
-			generate_intent(:say, "I heard #{info}")
+		fn(%Percept{about: :heard, value: %{info: info}}, _state) ->
+			words = case info do
+								map when is_map(map) ->
+									map_to_phrase(map)
+								string when is_binary(string) ->
+									string
+							end
+			generate_intent(:say, "I heard #{words}")
 		end
 	end
+
+	def map_to_phrase(map) when is_map(map) do
+		Enum.reduce(map,
+								"",
+			fn({key, value}, acc) ->
+				"#{key} #{value} #{acc}"
+			end)
+	end		
 	
 	def calm_down() do
 		fn(_percept, _state) ->

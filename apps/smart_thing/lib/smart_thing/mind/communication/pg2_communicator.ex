@@ -25,8 +25,8 @@ defmodule Marvin.SmartThing.PG2Communicator do
 	end
 
 	@doc "Report up to a member of the parent community"
-	def report_up(_device, _about, _value) do
-		Logger.warn("Report up not implemented by #{@name}")
+	def send_percept(_device, _about, _value) do
+		Logger.warn("Sending percepts not implemented by #{@name}")
 	end
 
 	def senses_awakened_by(sense) do

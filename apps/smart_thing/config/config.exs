@@ -30,10 +30,18 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
+
 # Configures the endpoint
+config :smart_thing,
+platforms: %{"mock_ev3" => Marvin.Ev3Mock.Platform,
+						 "ev3" => Marvin.Ev3.Platform,
+						 "hub" => Marvin.Hub.Platform},
+profiles: %{"puppy" => Marvin.Puppy.Profile,
+						"mommy" => Marvin.Mommy.Profile}
+
 config :smart_thing, SmartThing.Endpoint,
-url: [host: "localhost"],
-http: [port: (System.get_env("MARVIN_PORT") || 4000)],
+url: [host: "localhost", port: String.to_integer(System.get_env("MARVIN_PORT") || "4000")],
+http: [port: String.to_integer(System.get_env("MARVIN_PORT") || "4000")],
 root: Path.dirname(__DIR__),
 secret_key_base: "BtqMSrya4yeaCROpSicDZyFSgm+BRcaMaegBORz1SK/oQT811zd4IBnsxg1HLsCn",
 render_errors: [accepts: ~w(html json)],
@@ -50,13 +58,5 @@ level: :info,
 path: (if (System.get_env("MARVIN_PLATFORM") || "mock_ev3") == "ev3", do: "/mnt/ev3.log", else: "ev3.log"),
 format: "$time $metadata[$level] $message\n",
 metadata: [:request_id]
-
-config :smart_thing,
-platforms: %{"mock_ev3" => Marvin.Ev3Mock.Platform,
-						 "ev3" => Marvin.Ev3.Platform,
-						 "hub" => Marvin.Hub.Platform},
-profiles: %{"puppy" => Marvin.Puppy.Profile,
-						"mommy" => Marvin.Mommy.Profile}
-
 
 # import_config "#{Mix.env}.exs"

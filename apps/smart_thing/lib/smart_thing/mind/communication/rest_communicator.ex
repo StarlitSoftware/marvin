@@ -20,9 +20,9 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 		Logger.warn("Broadcast not implemented for #{@name}")
 	end
 
-	@doc "Report up to a member of the parent community"
-	def report_up(_device, about, value) do
-		GenServer.cast(@name, {:report_up, about, value})
+	@doc "Send percept to a member of the parent community"
+	def send_percept(_device, about, value) do
+		GenServer.cast(@name, {:send_percept, about, value})
 	end
 
 	def senses_awakened_by(_sense) do
@@ -36,7 +36,7 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 	####
 
 	def remote_percept(percept) do
-		Logger.info("Received remote percept #{inspect(percept.about)} from #{inspect(percept.source)}")
+		Logger.info("Received remote percept #{inspect(percept.about)}=#{inspect(percept.value)} from #{inspect(percept.source)}")
 		CNS.notify_perceived(percept)
 	end
 	
@@ -46,21 +46,22 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 		{:ok, []}
 	end
 
-	def handle_cast({:report_up, about, value}, state) do
-		url = "http://#{SmartThing.parent_url()}/marvin/percept"
-		body = %{percept: %{about: about,
-												value: value,
+	def handle_cast({:send_percept, about, value}, state) do
+		url = "http://#{SmartThing.parent_url()}/api/marvin/percept"
+		body = %{percept: %{about: "#{inspect about}",
+												value: "#{inspect(value)}",
 												source: %{community_name: SmartThing.community_name(),
 																	member_name: SmartThing.member_name(),
-																	rest_host: SmartThing.rest_host()}
+																	url: SmartThing.rest_source()}
 											 }
 						} |> Poison.encode!()
-		headers = []
+		headers = [{"Content-Type", "application/json"}]
+		Logger.info("Posting to #{url} with #{inspect body}")
 		case HTTPoison.post(url, body, headers) do
 			{:ok, _response} ->
-				Logger.info("Reported #{about} = #{inspect value} to #{url}")
+				Logger.info("Sent percept :report #{inspect value} to #{url}")
 			{:error, reason} ->
-				Logger.warn("FAILED to report #{about} = #{inspect value} to #{url}: #{reason}")
+				Logger.warn("FAILED to send percept #{inspect about} #{inspect value} to #{url} - #{inspect reason}")
 		end
 		{:noreply, state}
 	end

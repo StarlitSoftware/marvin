@@ -3,7 +3,7 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	use Supervisor
 	require Logger
 	alias Marvin.SmartThing
-	alias Marvin.SmartThing.{CNS, Attention, Memory, DetectorsSupervisor, PerceptorsSupervisor, MotivatorsSupervisor, BehaviorsSupervisor, ActuatorsSupervisor, InternalClock, PG2Communicator}
+	alias Marvin.SmartThing.{CNS, Attention, Memory, DetectorsSupervisor, PerceptorsSupervisor, MotivatorsSupervisor, BehaviorsSupervisor, ActuatorsSupervisor, InternalClock, PG2Communicator, RESTCommunicator}
 
 	@name __MODULE__
 
@@ -21,6 +21,7 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 		 	worker(CNS, []),
 		 	worker(Memory, []),
 		 	worker(PG2Communicator, []),
+		 	worker(RESTCommunicator, []),
 			worker(Attention, []),
 			worker(InternalClock, []),
 			supervisor(DetectorsSupervisor, []),

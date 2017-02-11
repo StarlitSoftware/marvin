@@ -3,7 +3,6 @@ defmodule Marvin.SmartThing do
 	alias Marvin.SmartThing.Communicators
 	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1, platform_dispatch: 2, profile_dispatch: 1]
 	
-
 	def platform() do
 		platform_name = System.get_env("MARVIN_PLATFORM") || "mock_ev3"
 		platforms = Application.get_env(:smart_thing, :platforms)
@@ -25,15 +24,22 @@ defmodule Marvin.SmartThing do
 	end
 
 	def rest_port() do
-		Application.get_env(:smart_thing, :http) |> Keyword.get(:port)
+		{port, _} = System.get_env("MARVIN_PORT") |> Integer.parse()
+		port
 	end
 
 	def rest_host() do
-		Application.get_env(:smart_thing, :url) |> Keyword.get(:host)
+		Application.get_env(:smart_thing, SmartThing.Endpoint)
+		|> Keyword.get(:url)
+		|> Keyword.get(:host)
 	end
 
 	def rest_source() do
-		"http://#{rest_host()}:#{rest_port()}/marvin"
+		"http://#{rest_host()}:#{rest_port()}"
+	end
+
+	def parent_url() do
+		System.get_env("MARVIN_PARENT_URL")
 	end
 
 	def member_name() do
@@ -51,7 +57,7 @@ defmodule Marvin.SmartThing do
 	def motors() do
 		platform_dispatch(:motors)
 	end
-
+	
 	def leds() do
 		platform_dispatch(:leds)
 	end

@@ -29,8 +29,13 @@ defmodule Marvin.SmartThing.Communicators do
   end
 
 	@doc "Broadcast information to all community members via a communicator device"
-	def broadcast(communicator_device, %{info: info}) do
+	def broadcast(communicator_device, info) do
 		apply(communicator_device.mod, :broadcast, [communicator_device, info])
+	end
+
+	@doc "Send a percept to a member of a remote community via a communicator device"
+	def send_percept(communicator_device, about, value ) do
+		apply(communicator_device.mod, :send_percept, [communicator_device, about, value])
 	end
 
 	### Private
