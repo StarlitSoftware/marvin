@@ -20,7 +20,7 @@ defmodule Marvin.SmartThing do
 	end
 
 	def community_name() do
-		System.get_env("MARVIN_COMMUNITY") || "lego"
+		System.get_env("MARVIN_COMMUNITY") || "marvin"
 	end
 
 	def rest_port() do
@@ -39,7 +39,7 @@ defmodule Marvin.SmartThing do
 	end
 
 	def parent_url() do
-		System.get_env("MARVIN_PARENT_URL")
+		System.get_env("MARVIN_PARENT_URL") || ""
 	end
 
 	def member_name() do
@@ -87,7 +87,7 @@ defmodule Marvin.SmartThing do
 	end
 
 	def id_channel() do
-		platform_dispatch(:id_channel)
+		String.to_integer(System.get_env("MARVIN_ID_CHANNEL") || "0")
 	end
 
 	def senses_for_id_channel(id_channel) do

@@ -1,7 +1,8 @@
-defmodule Marvin.Ev3Mock.SoundPlayer do
-	@moduledoc "A mock sound player"
+defmodule Marvin.SmartThing.SoundPlayer do
+	@moduledoc "A Linux sound player"
 
 	alias Marvin.SmartThing.Device
+	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
 
 	def new() do
 	    %Device{mod: __MODULE__,
@@ -27,7 +28,8 @@ defmodule Marvin.Ev3Mock.SoundPlayer do
 	###
 	
   @doc "Speak out words with a given volume, speed and voice"
-  def speak(words, volume, speed, voice \\ "en") do
+  def speak(words, volume, speed, v \\ nil) do
+		voice = v || platform_dispatch(:voice)
     args =  ["-a", "#{volume}", "-s", "#{speed}", "-v", "#{voice}", words]
     System.cmd("espeak", args)
   end

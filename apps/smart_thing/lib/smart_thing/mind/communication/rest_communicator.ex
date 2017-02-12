@@ -21,8 +21,8 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 	end
 
 	@doc "Send percept to a member of the parent community"
-	def send_percept(_device, about, value) do
-		GenServer.cast(@name, {:send_percept, about, value})
+	def send_percept(_device, url, about, value) do
+		GenServer.cast(@name, {:send_percept, url, about, value})
 	end
 
 	def senses_awakened_by(_sense) do
@@ -46,13 +46,13 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 		{:ok, []}
 	end
 
-	def handle_cast({:send_percept, about, value}, state) do
-		url = "http://#{SmartThing.parent_url()}/api/marvin/percept"
+	def handle_cast({:send_percept, url, about, value}, state) do
 		body = %{percept: %{about: "#{inspect about}",
 												value: "#{inspect(value)}",
 												source: %{community_name: SmartThing.community_name(),
 																	member_name: SmartThing.member_name(),
-																	url: SmartThing.rest_source()}
+																	member_url: SmartThing.rest_source(),
+																	id_channel: SmartThing.id_channel()}
 											 }
 						} |> Poison.encode!()
 		headers = [{"Content-Type", "application/json"}]

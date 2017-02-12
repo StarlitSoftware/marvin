@@ -1,8 +1,8 @@
-defmodule Mommy.Mixfile do
+defmodule Hub.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :mommy,
+    [app: :hub,
      version: "0.1.0",
      build_path: "../../_build",
      config_path: "../../config/config.exs",
@@ -36,7 +36,6 @@ defmodule Mommy.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [	{:smart_thing, in_umbrella: true}
-		]
+    [{:smart_thing, in_umbrella: true}]
   end
 end

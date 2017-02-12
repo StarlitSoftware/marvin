@@ -36,6 +36,7 @@ defmodule Puppy.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [	{:smart_thing, in_umbrella: true}
+		]
   end
 end

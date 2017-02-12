@@ -24,12 +24,14 @@ defmodule Marvin.Puppy.Perception do
 					span: nil, # no windowing
 					ttl: {10, :secs}, # remember for 10 seconds
 					logic: collision()),
+				# Sensing danger
 				PerceptorConfig.new(
 					name: :danger,
 					focus: %{senses: [:ambient, :collision, :danger, :time_elapsed], motives: [], intents: []},
 					span: {10, :secs}, # only react to what happened in the last 10 seconds
 					ttl: {30, :secs}, # remember for 30 secs
 					logic: danger()),
+				# Hunger pangs
 				PerceptorConfig.new(
 					name: :hungry,
 					focus: %{senses: [:time_elapsed], motives: [], intents: [:eat]},
@@ -50,6 +52,13 @@ defmodule Marvin.Puppy.Perception do
 					span: {10, :secs},
 					ttl: {30, :secs},
 					logic: scent()),
+				# A food is near perceptor
+				PerceptorConfig.new(
+					name: :food_nearby,
+					focus: %{senses: [:scent_strength], motives: [], intents: []},
+					span: {10, :secs},
+					ttl: {10, :secs},
+					logic: food_nearby()),
 				# A stuck perceptor
 				PerceptorConfig.new(
 					name: :stuck,
@@ -70,8 +79,7 @@ defmodule Marvin.Puppy.Perception do
 					focus: %{senses: [:heard, :food], motives: [], intents: []},
 					span: {10, :secs},
 					ttl: {10, :secs},
-					logic: other_eating())
-        
+					logic: other_eating())       
 		]
 	end
 
@@ -222,14 +230,14 @@ defmodule Marvin.Puppy.Perception do
 	(%Percept{about: {:beacon_distance, 1}, value: beacon_distance}, %{percepts: percepts, intents: intents}) ->
 			forward_attempts = count(
 			intents,
-			:go_forward,
-			5_000,
-			fn(_value) -> true end)
-			backward_attempts = count(
+			about: :go_forward,
+			since: 5_000,
+			test: fn(_value) -> true end)
+		  backward_attempts = count(
 			intents,
-			:go_backward,
-			5_000,
-			fn(_value) -> true end)
+			about: :go_backward,
+			since: 5_000,
+			test: fn(_value) -> true end)
 			if (forward_attempts + backward_attempts) > 1 do
 				average_beacon_distance = average(
 					percepts,
@@ -295,6 +303,27 @@ defmodule Marvin.Puppy.Perception do
 					Percept.new(about: :scent_direction, value: {:ahead, abs(heading), latest_value, n})
 			end
 			(_, _) ->
+				nil
+		end
+	end
+
+	# Is scent on channel 1 either strong or very strong
+	def food_nearby() do
+		fn
+			(%Percept{about: :scent_strength, value: {strength, channel}}, %{memories: memories}) ->
+				smelling_other_eating? = any_memory?(memories,
+																						 :other_eating,
+																						 2000,
+				fn(%{id_channel: eater_channel, current: current?}) ->
+					eater_channel == channel and current?
+				end)																					 
+				cond do
+				strength in [:strong, :very_strong] and channel == 1 or smelling_other_eating?->
+					Percept.new(about: :food_nearby, value: channel)
+				true ->
+					Percept.new(about: :food_nearby, value: 0) # channel 0 is no channel
+			end
+			(_,_) ->
 				nil
 		end
 	end

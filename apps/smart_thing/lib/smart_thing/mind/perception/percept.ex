@@ -34,6 +34,17 @@ defmodule Marvin.SmartThing.Percept do
 															 source: source}
 	end
 
+	@doc "Create a new percept with sense, value and source set"
+	def new(about: sense, value: value, source: source, ttl: ttl) do
+		msecs = now()
+		%Marvin.SmartThing.Percept{about: sense,
+															 since: msecs,
+															 until: msecs,
+															 value: value,
+															 source: source,
+															 ttl: ttl}
+	end
+
 	@doc "Create a new transient percept with sense, value set"
 	def new_transient(about: sense, value: value) do
 		msecs = now()

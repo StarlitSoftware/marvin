@@ -22,8 +22,31 @@ defmodule Marvin.SmartThing.MemoryUtils do
 		Enum.filter(memories, &(&1.about == about and (when_last_true(&1) + past) >= msecs))
 	end
 
+  @doc "Select from memories those about something since a past time that pass a test"
+	def select_memories(memories, about: about, since: past, test: test) do
+		msecs = now()
+		Enum.filter(memories,
+								&(&1.about == about
+									and (when_last_true(&1) + past) >= msecs
+									and test.(&1.value))
+		)
+	end
+
+	@doc "Apply a reduction function on selected memories from a recent past"
+	def reduce_memories(memories,
+											about: about,
+											since: past,
+											in: accumulator,
+											applying: reducer) do
+		Enum.reduce(select_memories(memories, about: about, since: past),
+								accumulator,
+			fn(memory, acc) ->
+				reducer.(memory.value, acc)
+			end)
+	end
+
 	@doc "Count applicable memories"
-	def count(memories, about, past, test) do
+	def count(memories, about: about, since: past, test: test) do
 		select_memories(memories, about: about, since: past)
 		|> Enum.filter(&(test.(&1.value)))
 		|> Enum.count()

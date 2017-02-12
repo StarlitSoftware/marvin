@@ -55,7 +55,12 @@ defmodule Marvin.SmartThing.PerceptorsHandler do
 					fn() ->
 						case Perceptor.analyze_percept(perceptor_config.name, percept) do
 							nil -> :ok
-							new_percept ->
+							new_percepts when is_list(new_percepts) ->
+								Enum.each(new_percepts,
+													&(CNS.notify_perceived(%{&1 |
+																			 ttl: perceptor_config.ttl,
+																			 source: perceptor_config.name} )))
+							new_percept = %Percept{} ->
 								CNS.notify_perceived(%{new_percept |
 																			 ttl: perceptor_config.ttl,
 																			 source: perceptor_config.name} )

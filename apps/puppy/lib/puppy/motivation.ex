@@ -4,6 +4,7 @@ defmodule Marvin.Puppy.Motivation do
 	require Logger
 
 	alias Marvin.SmartThing.{MotivatorConfig, Motive, Percept}
+	alias Marvin.SmartThing
 	import Marvin.SmartThing.MemoryUtils
 	
 	@doc "Give the configurations of all motivators. Motivators turn motives on and off"
@@ -19,14 +20,14 @@ defmodule Marvin.Puppy.Motivation do
 			# A hunger motivator
 			MotivatorConfig.new(
 				name: :hunger,
-				focus: %{senses: [:hungry, :danger], motives: [], intents: []},
+				focus: %{senses: [:hungry, :danger, :mom_says], motives: [], intents: []},
 				span: nil, # for as long as we can remember
 				logic: hunger(),
 			),
 			# A fear motivator
 			MotivatorConfig.new(
 				name: :fear,
-				focus: %{senses: [:danger], motives: [], intents: []},
+				focus: %{senses: [:danger, :mom_says], motives: [], intents: []},
 				span: nil, # for as long as we can remember
 				logic: fear()
 			),
@@ -61,11 +62,20 @@ defmodule Marvin.Puppy.Motivation do
 	def hunger() do
 		fn
 		(%Percept{about: :hungry, value: :very}, %{percepts: percepts }) ->
-				if not any_memory?(
-							percepts,
-							:danger,
-							5_000,
-							fn(_value) -> true end) do
+			no_danger? = not any_memory?(percepts, :danger, 5_000, fn(_value) -> true end)
+			mom_allows? = not any_memory?(percepts,
+																	 :mom_says,
+																	 5_000,
+				fn(value) ->
+					case value do
+						%{command: :stop_eating,
+							 channel: channel} ->
+							channel == SmartThing.id_channel()
+						_ ->
+							false
+					end
+					end)
+			if no_danger? && mom_allows? do
 					Motive.on(:hunger) |> Motive.inhibit(:curiosity)
 				else
 					nil
@@ -82,6 +92,8 @@ defmodule Marvin.Puppy.Motivation do
 		fn
 		(%Percept{about: :danger, value: :high}, _) ->
 				Motive.on(:fear) |> Motive.inhibit_all()
+		(%Percept{about: :mom_says, value: %{command: :calm_down}}, _) ->
+				Motive.off(:fear)
 		(%Percept{about: :danger, value: :none}, _) ->
 				Motive.off(:fear)
 		(_,_) ->

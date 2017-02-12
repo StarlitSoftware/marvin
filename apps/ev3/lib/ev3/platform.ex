@@ -71,11 +71,6 @@ defmodule Marvin.Ev3.Platform do
 		System.cmd("poweroff", [])
 	end
 
-	def id_channel() do
-		{channel, _} = Integer.parse(System.get_env("MARVIN_ID_CHANNEL"))
-		channel
-	end
-
 	def voice() do
 		Application.get_env(:ev3, :voice, "en-us")
 	end

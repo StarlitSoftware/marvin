@@ -9,10 +9,9 @@ defmodule Marvin.SmartThing.Communicating do
 	@callback broadcast(device :: %Device{}, info :: any) :: any
 
 	@doc "Send a percept (typically) to the member of another community"
-	@callback send_percept(device :: %Device{}, about :: any, value :: any) :: any
+	@callback send_percept(device :: %Device{}, url :: any, about :: any, value :: any) :: any
 
 	@doc "The senses that become attended to when a given sense is also attended to"
 	@callback senses_awakened_by(sense :: any) :: [any]
-
 		
 end

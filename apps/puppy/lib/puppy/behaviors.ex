@@ -1,8 +1,9 @@
 defmodule Marvin.Puppy.Behaviors do
-	@moduledoc "Provides the configurations of all behaviors to be activated"
+	@moduledoc "Provides the configurations of all puppy behaviors to be activated"
 
 	require Logger
-	alias Marvin.SmartThing.{BehaviorConfig, FSM, Transition, CNS, Percept, Intent}
+	import Marvin.SmartThing.BehaviorUtils
+	alias Marvin.SmartThing.{BehaviorConfig, FSM, Transition, Percept}
 
 	@doc "Give the configurations of all benaviors to be activated by motives and driven by percepts"
   def behavior_configs() do
@@ -182,8 +183,16 @@ defmodule Marvin.Puppy.Behaviors do
                          end,
 											   doing: change_course()
 											 },
+						%Transition{from: [:on_track, :off_track],
+												on: :food_nearby,
+												to: :off_scent,
+												 condition: fn(value, _sense_qualifier, _motives) ->
+                           value != 0 # channel 0 means no food nearby
+                         end,
+											   doing: express_food_nearby()
+											 },
 						%Transition{to: :ended,
-												doing: turn_on_green_leds()
+												doing: stop_tracking()
 											 }
 					]
 				}
@@ -228,25 +237,6 @@ defmodule Marvin.Puppy.Behaviors do
   end
 	
   ### Private
-
-  defp generate_intent(about) do
-    generate_intent(about, nil)
-  end
-  
-  defp generate_intent(about, value, strong? \\ false) do
-    if strong? do
-      Intent.new_strong(about: about, value: value)
-    else
-      Intent.new(about: about, value: value)
-    end
-    |> CNS.notify_intended()
-  end
-
-	defp nothing() do
-		fn(_percept, _state) ->
-			Logger.info("Doing NOTHING")
-		end
-	end
 
 	defp turn_on_green_leds() do
 		fn(_percept, _state) ->
@@ -385,7 +375,15 @@ defmodule Marvin.Puppy.Behaviors do
 			generate_intent(:broadcast, %{doing: :tracking})
 			generate_intent(:report, %{doing: :tracking})
     end
-  end
+   end
+
+  defp stop_tracking() do
+		fn(_percept, _state) ->
+			Logger.info("STOP TRACKING")
+			turn_on_green_leds()
+			generate_intent(:report, %{stopping: :tracking})
+		end
+	end
  
 	defp eat() do
 		fn(%Percept{about: :food, value: value}, _state) ->
@@ -400,6 +398,16 @@ defmodule Marvin.Puppy.Behaviors do
 			generate_intent(:broadcast, %{doing: :eating})
 			generate_intent(:report, %{doing: :eating})
 			generate_intent(:eat, how_much)
+		end
+	end
+
+	defp express_food_nearby() do
+		fn(%Percept{about: :food_nearby, value: channel}, _state) ->
+			Logger.info("EXPRESSING food nearby (channel = #{channel})")
+			generate_intent(:say_food_nearby)
+			generate_intent(:broadcast, %{feeling: :food_nearby})
+			generate_intent(:report, %{feeling: :food_nearby,
+																 channel: channel})
 		end
 	end
 

@@ -24,9 +24,6 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 	@doc "Shuts the device down"
 	@callback shutdown() :: any
 
-	@doc "A channel identifying the smart thing"
-	@callback id_channel() :: any
-
 	@doc "Returns the platform's devce manager for the given type"
 	@callback device_manager(type :: atom) :: any
 

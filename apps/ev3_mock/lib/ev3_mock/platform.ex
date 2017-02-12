@@ -1,6 +1,6 @@
 defmodule Marvin.Ev3Mock.Platform do
 
-	@moduledoc "A mock platform"
+	@moduledoc "The mock EV3 platform"
 
 	@behaviour Marvin.SmartThing.PlatformBehaviour
 
@@ -10,10 +10,9 @@ defmodule Marvin.Ev3Mock.Platform do
 												UltrasonicSensor,
 												GyroSensor,
 												Tachomotor,
-												LED,
-												SoundPlayer
+												LED
 											 }
-	alias Marvin.SmartThing.Device
+	alias Marvin.SmartThing.{Device, SoundPlayer}
 	require Logger
 	
 	### PlatformBehaviour
@@ -23,7 +22,7 @@ defmodule Marvin.Ev3Mock.Platform do
 	end
 
 	def actuation_logic() do
-		Marvin.Ev3.Actuation.actuator_configs()
+		Marvin.Ev3.Actuation.actuator_configs() # Use Ev3's actuation
 	end
 	
 	def mode(_device_type) do
@@ -77,11 +76,6 @@ defmodule Marvin.Ev3Mock.Platform do
 		System.cmd("poweroff", [])
 	end
 
-	def id_channel() do
-		{channel, _} = Integer.parse(System.get_env("MARVIN_ID_CHANNEL"))
-		channel
-	end
-
 	def voice() do
 		"en-us"
 	end
@@ -102,20 +96,13 @@ defmodule Marvin.Ev3Mock.Platform do
 		apply(device.mod, :sensitivity, [device, sense])
 	end
 
-	def actuator_configs() do
-		Marvin.Ev3.Actuation.actuator_configs() # Use the Ev3 actuators (acutal actuators are mocked)
-	end
-
 	def senses_for_id_channel(channel) do
 		[{:beacon_heading, channel}, {:beacon_distance, channel}, {:beacon_on, channel}]
 	end
 
-	###
-
 	def execute_command(%Device{mock: true} = device, command, params) do
 		apply(device.mod, command, [device | params])
 	end
-
 
 	@doc "Nudge the value of a sense from a mock device"
 	def nudge(%Device{mock: true} = device, sense, value, previous_value) do 

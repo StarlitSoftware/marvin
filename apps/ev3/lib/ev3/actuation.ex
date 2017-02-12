@@ -1,9 +1,10 @@
 defmodule Marvin.Ev3.Actuation do
-	@moduledoc "Provides the configurations of all actuators to be activated"
+	@moduledoc "Provides the configurations of all EV3 robot actuators to be activated"
 
 	require Logger
 
 	alias Marvin.SmartThing.{ActuatorConfig, MotorSpec, LEDSpec, SoundSpec, CommSpec, Activation, Script}
+	alias Marvin.SmartThing
   import Marvin.SmartThing.Utils
 	
 	@doc "Give the configurations of all actuators to be activated"
@@ -72,6 +73,8 @@ defmodule Marvin.Ev3.Actuation do
                                        action: say_stuck()},
                            %Activation{intent: :say_food,
                                        action: say_food()},
+                           %Activation{intent: :say_food_nearby,
+                                       action: say_food_nearby()},
                            %Activation{intent: :eating_noises,
                                        action: eating_noises()},
                            %Activation{intent: :say,
@@ -250,6 +253,13 @@ defmodule Marvin.Ev3.Actuation do
     end
   end
   
+  defp say_food_nearby() do
+    fn(_intent, sound_players) ->
+      Script.new(:say_food_near_by, sound_players)
+      |> Script.add_step(:loud_speech, :speak, ["I smell food!"])
+    end
+  end
+  
   defp say_food() do
     fn(_intent, sound_players) ->
       Script.new(:say_food, sound_players)
@@ -282,8 +292,9 @@ defmodule Marvin.Ev3.Actuation do
   
 	defp report() do
 		fn(intent, communicators) ->
+			url = "http://#{SmartThing.parent_url()}/api/marvin/percept"
 			Script.new(:report, communicators)
-			|> Script.add_step(:remote, :send_percept, [:report, intent.value])
+			|> Script.add_step(:remote, :send_percept, [url, :report, intent.value])
 		end
 	end
 

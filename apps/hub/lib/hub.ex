@@ -1,0 +1,2 @@
+defmodule Hub do
+end
