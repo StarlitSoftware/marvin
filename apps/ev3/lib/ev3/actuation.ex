@@ -292,7 +292,7 @@ defmodule Marvin.Ev3.Actuation do
   
 	defp report() do
 		fn(intent, communicators) ->
-			url = "http://#{SmartThing.parent_url()}/api/marvin/percept"
+			url = SmartThing.parent_url()
 			Script.new(:report, communicators)
 			|> Script.add_step(:remote, :send_percept, [url, :report, intent.value])
 		end

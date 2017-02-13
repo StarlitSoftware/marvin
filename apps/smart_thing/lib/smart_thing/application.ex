@@ -57,7 +57,7 @@ defmodule Marvin.SmartThing.Application do
 
 	defp connect_to_nodes() do
 		Node.connect(Marvin.SmartThing.peer()) # join the peer network
-		Logger.warn("#{Node.self()} is connected to #{inspect Node.list()}")
+		Logger.info("#{Node.self()} is connected to #{inspect Node.list()}")
 	end
 
   defp mem_stats() do

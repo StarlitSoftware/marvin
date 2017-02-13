@@ -5,16 +5,18 @@ defmodule SmartThing.PerceptionController do
   use Phoenix.Controller
 	alias Marvin.SmartThing.RESTCommunicator
 	alias Marvin.SmartThing.Percept
+	import Marvin.SmartThing.Utils, only: [now: 0]
 	require Logger
 
 	@doc "Handle incoming perception from another community"
 	def handle_percept(conn,
 										 %{"percept" => %{"about" => about_s,
-																			"value" => value_s,
-																			"source" => %{"community_name" => community_name,
-																										"member_name" => member_name,
-																										"member_url" => url,
-																										"id_channel" => id_channel}
+																			"value" => %{"is" => value_s,
+																									 "from" => %{"community_name" => community_name,
+																															 "member_name" => member_name,
+																															 "member_url" => url,
+																															 "id_channel" => id_channel}
+																									 }
 																		 }
 											}
 			) do
@@ -25,7 +27,8 @@ defmodule SmartThing.PerceptionController do
 																	 from: %{community_name: community_name,
 																					 member_name: member_name,
 																					 member_url: url,
-																					 id_channel: id_channel}
+																					 id_channel: id_channel},
+																	 when: now() # so that each report is always a new percept
 																	},
 													source: __MODULE__,
 													ttl: 60_000) # reports are always to be remembered for one minute

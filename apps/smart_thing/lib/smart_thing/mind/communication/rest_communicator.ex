@@ -46,22 +46,23 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 		{:ok, []}
 	end
 
-	def handle_cast({:send_percept, url, about, value}, state) do
+	def handle_cast({:send_percept, partial_url, about, value}, state) do
+		full_url = "http://#{partial_url}/api/marvin/percept"
 		body = %{percept: %{about: "#{inspect about}",
-												value: "#{inspect(value)}",
-												source: %{community_name: SmartThing.community_name(),
-																	member_name: SmartThing.member_name(),
-																	member_url: SmartThing.rest_source(),
-																	id_channel: SmartThing.id_channel()}
+												value: %{is: "#{inspect(value)}",
+																 from: %{community_name: SmartThing.community_name(),
+																				 member_name: SmartThing.member_name(),
+																				 member_url: SmartThing.rest_source(),
+																				 id_channel: SmartThing.id_channel()}}
 											 }
 						} |> Poison.encode!()
 		headers = [{"Content-Type", "application/json"}]
-		Logger.info("Posting to #{url} with #{inspect body}")
-		case HTTPoison.post(url, body, headers) do
+		Logger.info("Posting to #{full_url} with #{inspect body}")
+		case HTTPoison.post(full_url, body, headers) do
 			{:ok, _response} ->
-				Logger.info("Sent percept :report #{inspect value} to #{url}")
+				Logger.info("Sent percept :report #{inspect value} to #{full_url}")
 			{:error, reason} ->
-				Logger.warn("FAILED to send percept #{inspect about} #{inspect value} to #{url} - #{inspect reason}")
+				Logger.warn("FAILED to send percept #{inspect about} #{inspect value} to #{full_url} - #{inspect reason}")
 		end
 		{:noreply, state}
 	end

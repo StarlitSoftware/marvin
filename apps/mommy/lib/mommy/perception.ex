@@ -30,7 +30,8 @@ defmodule Marvin.Mommy.Perception do
 			(%Percept{about: :report,
 								value: %{is: %{feeling: :panic},
 												 from: %{community_name: community,
-																 member_url: member_url}}
+																 member_url: member_url,
+																 member_name: member_name}}
 							 },
 				%{percepts: percepts}) ->
 				how_many_panics = summation(
@@ -40,21 +41,23 @@ defmodule Marvin.Mommy.Perception do
 				fn(value) ->
 					case value do
 						%{is: %{feeling: :panic},
-							from: %{commmunity_name: a_community,
-											member_url: a_member_url}
-						 } when community == a_community and member_url == a_member_url -> 1
-						_ -> 0
+							from: %{community_name: a_community,
+										  member_url: a_member_url}} when community == a_community and member_url == a_member_url -> 1
+						_ ->
+							0
 					end
 				end,
 				0
 			) # How many brood panics in the last 30 secs?
 			cond do
 				how_many_panics > 2 ->
-					Percept.new(about: :out_of_control_panicking, value: %{member_url: member_url})
+					Percept.new(about: :out_of_control_panicking, value: %{member_name: member_name, member_url: member_url})
 				true ->
 					nil
 			end
-			(_,_) -> nil
+			(percept,_) ->
+				Logger.warn("Failed analysis of #{inspect percept}")
+				nil
 		end
 	end
 
