@@ -40,7 +40,8 @@ profiles: %{"puppy" => Marvin.Puppy.Profile,
 						"mommy" => Marvin.Mommy.Profile}
 
 config :smart_thing, SmartThing.Endpoint,
-url: [host: "localhost", port: String.to_integer(System.get_env("MARVIN_PORT") || "4000")],
+url: [host: (System.get_env("MARVIN_HOST") || "localhost"),
+			port: String.to_integer(System.get_env("MARVIN_PORT") || "4000")],
 http: [port: String.to_integer(System.get_env("MARVIN_PORT") || "4000")],
 root: Path.dirname(__DIR__),
 secret_key_base: "BtqMSrya4yeaCROpSicDZyFSgm+BRcaMaegBORz1SK/oQT811zd4IBnsxg1HLsCn",

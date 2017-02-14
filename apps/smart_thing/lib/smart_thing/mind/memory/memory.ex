@@ -206,7 +206,7 @@ defmodule Marvin.SmartThing.Memory do
 	end
 	
 	defp update_motives(%Motive{} = motive, [current|rest]) do
-		if motive.value != current.value do
+		if not(motive.value == current.value and Map.equal?(motive.details, current.details)) do
 			CNS.notify_memorized(:new, motive)
 			[motive, current | rest]
 		else

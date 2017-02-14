@@ -74,9 +74,10 @@ defmodule Marvin.Puppy.Perception do
 					ttl: {10, :secs},
 					logic: other_panicking()),
         # A "someone is eating, I did not find food myself and I am hungry" perceptor
+				# Also "I no longer hear some other eat that got me greedy" perceptor
 				PerceptorConfig.new(
 					name: :other_eating,
-					focus: %{senses: [:heard, :food], motives: [], intents: []},
+					focus: %{senses: [:heard, :food, :time_elapsed], motives: [], intents: []},
 					span: {10, :secs},
 					ttl: {10, :secs},
 					logic: other_eating())       
@@ -307,7 +308,7 @@ defmodule Marvin.Puppy.Perception do
 		end
 	end
 
-	# Is scent on channel 1 either strong or very strong
+	# Is scent on channel of overheard eater either strong or very strong?
 	def food_nearby() do
 		fn
 			(%Percept{about: :scent_strength, value: {strength, channel}}, %{memories: memories}) ->
@@ -318,10 +319,10 @@ defmodule Marvin.Puppy.Perception do
 					eater_channel == channel and current?
 				end)																					 
 				cond do
-				strength in [:strong, :very_strong] and channel == 1 or smelling_other_eating?->
+				strength in [:strong, :very_strong] and (channel == 1 or smelling_other_eating?) ->
 					Percept.new(about: :food_nearby, value: channel)
 				true ->
-					Percept.new(about: :food_nearby, value: 0) # channel 0 is no channel
+					Percept.new(about: :food_nearby, value: 0) # no food nearby
 			end
 			(_,_) ->
 				nil
@@ -346,7 +347,7 @@ defmodule Marvin.Puppy.Perception do
       end
   end
 
-  @doc "Heard someone else say food and I did not find food myself and I am motivated by hunger"
+  @doc "Heard someone else say food and I did not find food myself"
   def other_eating() do
     fn
       (%Percept{about: :heard, value: %{info: %{doing: :eating}, id_channel: id_channel}}, %{percepts: percepts}) ->
@@ -355,12 +356,33 @@ defmodule Marvin.Puppy.Perception do
 						:food,
 						2000,
 						fn(value) -> value in [:litte, :plenty] end) do
-         Logger.warn("@@@@ SOMEONE'S EATING!!! @@@@")
-         Percept.new(about: :other_eating,
+        Logger.warn("@@@@ SOMEONE'S at #{id_channel} is EATING!!! @@@@")
+        Percept.new(about: :other_eating,
                     value: %{id_channel: id_channel, current: true})
-     else
-       nil
+			else
+        Percept.new(about: :other_eating,
+                    value: %{id_channel: id_channel, current: false})
 			end
+			(%Percept{about: :time_elapsed}, %{percepts: percepts}) ->
+				# For all who have been heard eating but not recently
+				old_hearings = select_memories(percepts,
+																			 about: :heard,
+																			 not_since: 2_000,
+																			 test:
+				fn(value) ->
+					case value do
+						%{info: %{doing: :eating}} -> true
+						_ -> false
+					end
+				end)
+			new_percepts = Enum.map(old_hearings,
+				fn(%Percept{value: %{id_channel: id_channel}}) ->
+					Logger.warn("Someone at #{id_channel} is no longer eating")
+					Percept.new(about: :other_eating,
+											value: %{id_channel: id_channel, current: false})
+				end)
+			new_percepts
+			nil
 	    (_,_) -> nil
     end
   end

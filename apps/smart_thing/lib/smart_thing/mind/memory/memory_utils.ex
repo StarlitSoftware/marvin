@@ -15,6 +15,12 @@ defmodule Marvin.SmartThing.MemoryUtils do
 		Enum.filter(memories, &(&1.about == about))
 	end
 		
+  @doc "Select from memories those about something"
+	def select_memories(memories, about: about, test: test) do
+		Enum.filter(memories, &(&1.about == about
+														and test.(&1.value)))
+	end
+		
 
   @doc "Select from memories those about something since a past time"
 	def select_memories(memories, about: about, since: past) do
@@ -30,6 +36,31 @@ defmodule Marvin.SmartThing.MemoryUtils do
 									and (when_last_true(&1) + past) >= msecs
 									and test.(&1.value))
 		)
+	end
+
+  @doc "Select from memories those about something ONLY prior a past time"
+	def select_memories(memories, about: about, not_since: past) do
+		msecs = now()
+		all_prior_to = Enum.filter(memories, &(&1.about == about and (msecs - when_last_true(&1)) > past))
+		all_since = select_memories(memories, about: about, since: past)
+		Enum.reject(all_prior_to,
+			fn(one_prior_to) ->
+				Enum.any?(all_since , fn(one_since) -> one_since.value == one_prior_to.value end)
+			end)
+	end
+
+  @doc "Select from memories those about something ONLY prior a past time that pass a test"
+	def select_memories(memories, about: about, not_since: past, test: test) do
+		msecs = now()
+		all_prior_to = Enum.filter(memories,
+															 &(&1.about == about
+																 and (msecs - when_last_true(&1)) > past)
+															 and test.(&1.value))
+		all_since = select_memories(memories, about: about, since: past, test: test)
+		Enum.reject(all_prior_to,
+			fn(one_prior_to) ->
+				Enum.any?(all_since , fn(one_since) -> one_since.value == one_prior_to.value end)
+			end)
 	end
 
 	@doc "Apply a reduction function on selected memories from a recent past"

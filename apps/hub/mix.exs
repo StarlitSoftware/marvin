@@ -36,6 +36,7 @@ defmodule Hub.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:smart_thing, in_umbrella: true}]
+    [{:smart_thing, in_umbrella: true},
+		 {:mommy, in_umbrella: true}]
   end
 end

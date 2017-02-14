@@ -55,7 +55,7 @@ defmodule Marvin.Puppy.Behaviors do
 			BehaviorConfig.new( # roam around
 				name: :exploring,
 				motivated_by: [:curiosity],
-				senses: [:collision, :time_elapsed, :stuck],
+				senses: [:collision, :time_elapsed],
 				fsm: %FSM{
 					initial_state: :started,
 					final_state: :ended,
@@ -81,7 +81,7 @@ defmodule Marvin.Puppy.Behaviors do
 			BehaviorConfig.new( # look for food in bright places
 				name: :foraging,
 				motivated_by: [:hunger],
-				senses: [:food, :scent_strength, :scent_direction, :collision, :stuck],
+				senses: [:food, :scent_strength, :scent_direction],
 				fsm: %FSM{
 					initial_state: :started,
 					final_state: :ended,
@@ -136,7 +136,7 @@ defmodule Marvin.Puppy.Behaviors do
 			BehaviorConfig.new( # Track another community member to compete for a food source
 				name: :tracking,
 				motivated_by: [:greed],
-				senses: [:food, :scent_strength, :scent_direction, :collision, :stuck],
+				senses: [:food, :food_nearby, :scent_strength, :scent_direction],
 				fsm: %FSM{
 					initial_state: :started,
 					final_state: :ended,
@@ -185,7 +185,7 @@ defmodule Marvin.Puppy.Behaviors do
 											 },
 						%Transition{from: [:on_track, :off_track],
 												on: :food_nearby,
-												to: :off_scent,
+												to: :on_track,
 												 condition: fn(value, _sense_qualifier, _motives) ->
                            value != 0 # channel 0 means no food nearby
                          end,

@@ -55,8 +55,7 @@ defmodule Marvin.Mommy.Perception do
 				true ->
 					nil
 			end
-			(percept,_) ->
-				Logger.warn("Failed analysis of #{inspect percept}")
+			(_, _) ->
 				nil
 		end
 	end
@@ -68,7 +67,7 @@ defmodule Marvin.Mommy.Perception do
 								value: %{is: %{feeling: :food_nearby,
 															 channel: channel},
 												 from: %{community_name: community,
-																 member_url: puppy_url}}},
+																 member_url: puppy_url}}} = percept,
 				%{percepts: percepts}) when channel != 0 ->
 				hoggings = select_memories(percepts,
 																	 about: :report,
@@ -85,9 +84,10 @@ defmodule Marvin.Mommy.Perception do
 					end
 				end)
 			if Enum.count(hoggings) > 1 do
-				[%Percept{value: %{member_url: hogger_url}} | _ ] = hoggings
+				[%Percept{value: %{from: %{member_url: hogger_url, member_name: hogger_name}}} | _ ] = hoggings
 				Percept.new(about: :food_hogging,
-										value: %{member_url: hogger_url})
+										value: %{member_url: hogger_url,
+														 member_name: hogger_name})
 			else
 				nil
 			end

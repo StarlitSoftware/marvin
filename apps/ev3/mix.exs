@@ -29,7 +29,8 @@ defmodule Ev3.Mixfile do
      {:logger_file_backend, "~> 0.0.8"},
      {:nerves_interim_wifi, "~> 0.0.1"},
      {:ex_ncurses, github: "jfreeze/ex_ncurses", ref: "2fd3ecb1c8a1c5e04ddb496bb8d57f30b619f59e"},
-		 {:smart_thing, in_umbrella: true}
+		 {:smart_thing, in_umbrella: true},
+		 {:puppy, in_umbrella: true}
 		]
   end
 

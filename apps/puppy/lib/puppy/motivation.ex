@@ -4,7 +4,6 @@ defmodule Marvin.Puppy.Motivation do
 	require Logger
 
 	alias Marvin.SmartThing.{MotivatorConfig, Motive, Percept}
-	alias Marvin.SmartThing
 	import Marvin.SmartThing.MemoryUtils
 	
 	@doc "Give the configurations of all motivators. Motivators turn motives on and off"
@@ -34,7 +33,7 @@ defmodule Marvin.Puppy.Motivation do
       # Tracking another robot to steal its food
       MotivatorConfig.new(
         name: :greed,
-        focus: %{senses: [:heard_eating], motives: [:hunger], intents: []},
+        focus: %{senses: [:other_eating], motives: [:hunger], intents: []},
         span: nil,
         logic: greed()
       )
@@ -68,9 +67,8 @@ defmodule Marvin.Puppy.Motivation do
 																	 5_000,
 				fn(value) ->
 					case value do
-						%{command: :stop_eating,
-							 channel: channel} ->
-							channel == SmartThing.id_channel()
+						%{is: %{command: :stop_eating}} ->
+							true
 						_ ->
 							false
 					end
@@ -78,8 +76,10 @@ defmodule Marvin.Puppy.Motivation do
 			if no_danger? && mom_allows? do
 					Motive.on(:hunger) |> Motive.inhibit(:curiosity)
 				else
-					nil
-				end
+					Motive.off(:hunger)
+			end
+			(%Percept{about: :mom_says, value: %{is: %{command: :stop_eating}}}, _) ->
+				Motive.off(:hunger)
 	  (%Percept{about: :hungry, value: :not}, _) ->
 				Motive.off(:hunger)
 	  (_,_) ->
@@ -92,7 +92,7 @@ defmodule Marvin.Puppy.Motivation do
 		fn
 		(%Percept{about: :danger, value: :high}, _) ->
 				Motive.on(:fear) |> Motive.inhibit_all()
-		(%Percept{about: :mom_says, value: %{command: :calm_down}}, _) ->
+		(%Percept{about: :mom_says, value: %{is: %{command: :calm_down}}}, _) ->
 				Motive.off(:fear)
 		(%Percept{about: :danger, value: :none}, _) ->
 				Motive.off(:fear)
@@ -109,11 +109,13 @@ defmodule Marvin.Puppy.Motivation do
             motives,
             :hunger,
             fn(value) -> value == :on end) do
+				Logger.warn("GREED toward #{id_channel} IS ON")
         Motive.on(:greed, %{id_channel: id_channel}) |> Motive.inhibit(:hunger)
 	    else
         nil
       end
       (%Percept{about: :other_eating, value: %{current: false, id_channel: id_channel}}, _) ->
+				Logger.warn("GREED toward #{id_channel} IS OFF")
         Motive.off(:greed, %{id_channel: id_channel})
 		  (_,_) ->
 				nil

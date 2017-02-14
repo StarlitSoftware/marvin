@@ -55,7 +55,7 @@ defmodule Marvin.Hub.Actuation do
     fn(%Intent{value: %{member_name: member_name}}, sound_players) ->
 			name = name_from(member_name)
       Script.new(:say_calm_down, sound_players)
-      |> Script.add_step(:loud_speech, :speak, ["Be nice, #{name}. Share your food"])
+      |> Script.add_step(:loud_speech, :speak, ["#{name}, share your food!"])
     end
   end
 
