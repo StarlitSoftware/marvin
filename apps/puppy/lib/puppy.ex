@@ -1,2 +1,0 @@
-defmodule Puppy do
-end

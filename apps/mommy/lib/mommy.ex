@@ -1,2 +1,0 @@
-defmodule Mommy do
-end
