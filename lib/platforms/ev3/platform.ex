@@ -4,14 +4,14 @@ defmodule Marvin.Ev3.Platform do
 
 	@moduledoc "Module implementing smart thing platform_dispatch calls"
 
-	alias Marvin.Ev3.{Actuation, LegoSensor, LegoMotor, LegoSound, LegoLED, InfraredSensor}
+	alias Marvin.Ev3.{Brick, Actuation, LegoSensor, LegoMotor, LegoSound, LegoLED, InfraredSensor}
 	require Logger
 	
 	### PlatformBehaviour
 
 	def start() do
 		Logger.info("Starting ev3 platform")
-		Application.start(nil, [])
+		Marvin.Ev3.Brick.start()
 	end
 
 	def actuation_logic() do

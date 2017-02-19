@@ -24,25 +24,24 @@ defmodule SmartThing.Mixfile do
   # Type "mix help compile.app" for more information
   def application() do
     # Specify extra applications you'll use from Erlang/Elixir
-    [extra_applications: [:runtime_tools, 
+    [applications: [:runtime_tools, 
 													:logger,
 													:logger_file_backend,
-													:phoenix,
+													:phoenix,  
 													:phoenix_html,
 													:cowboy,
 													:gettext,
-													:httpoison
+													:httpoison,
+													:elixir_make
 												 ] ++ nerves_apps(),
-     mod: {Marvin.Application, []}
+    mod: {Marvin.Application, []} 
 		]
   end
 
  defp nerves_apps() do
 #	 if (System.get_env("MARVIN_NERVES") || "no") == "yes" do
 		 [:nerves_interim_wifi,
-			:ex_ncurses,
-			:nerves,
-			:nerves_system_ev3,]
+			:ex_ncurses]
 #	 else
 #		 []
 #	 end

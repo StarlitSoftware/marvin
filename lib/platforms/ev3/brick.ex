@@ -1,9 +1,9 @@
-defmodule Marvin.Ev3.Application do
+defmodule Marvin.Ev3.Brick do
   use Application
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
-  def start(_type, _args) do
+  def start() do
     import Supervisor.Spec
 
     # Initialize
@@ -18,11 +18,13 @@ defmodule Marvin.Ev3.Application do
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: NervesEv3Example.Supervisor]
+    opts = [strategy: :one_for_one, name: Marvin.Ev3.BrickSupervisor]
     Supervisor.start_link(children, opts)
   end
 
   defp load_ev3_modules() do
+		wifi_driver = Application.get_env(:marvin, :wifi_driver)
+    System.cmd("modprobe", [wifi_driver])
     System.cmd("/sbin/udevd", ["--daemon"])
     Process.sleep(1000)  # I do not like this line
 

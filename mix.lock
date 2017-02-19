@@ -11,7 +11,7 @@
   "idna": {:hex, :idna, "1.2.0", "ac62ee99da068f43c50dc69acf700e03a62a348360126260e87f2b54eced86b2", [:rebar3], []},
   "logger_file_backend": {:hex, :logger_file_backend, "0.0.9", "5c2f7d4a28431e695cdf94d191523dbafe609321a67bb654254897f546c393db", [:mix], []},
   "metrics": {:hex, :metrics, "1.0.1", "25f094dea2cda98213cecc3aeff09e940299d950904393b2a29d191c346a8486", [:rebar3], []},
-  "mime": {:hex, :mime, "1.0.1", "05c393850524767d13a53627df71beeebb016205eb43bfbd92d14d24ec7a1b51", [:mix], []},
+  "mime": {:hex, :mime, "1.1.0", "01c1d6f4083d8aa5c7b8c246ade95139620ef8effb009edde934e0ec3b28090a", [:mix], []},
   "mimerl": {:hex, :mimerl, "1.0.2", "993f9b0e084083405ed8252b99460c4f0563e41729ab42d9074fd5e52439be88", [:rebar3], []},
   "nerves": {:hex, :nerves, "0.4.7", "c8d08348e6f717cf140da26dc374bcf2f6f7c2bec646073aeab049e08b588173", [:mix], [{:distillery, "~> 1.0", [hex: :distillery, optional: false]}]},
   "nerves_interim_wifi": {:hex, :nerves_interim_wifi, "0.0.2", "51c51578fc0a5d929a8ea26d54e6f470bcca24762742473cb44be3a622458a98", [:make, :mix], [{:elixir_make, "~> 0.3", [hex: :elixir_make, optional: false]}, {:nerves_network_interface, "~> 0.3.1", [hex: :nerves_network_interface, optional: false]}, {:nerves_wpa_supplicant, "~> 0.2.2", [hex: :nerves_wpa_supplicant, optional: false]}]},

@@ -1,6 +1,6 @@
 ## Name of the node
--sname marv
-# -sname rodney
+#-sname marv
+-sname rodney
 
 ## Cookie for distributed erlang
 -setcookie minsky
@@ -10,18 +10,19 @@
 #-user Elixir.IEx.CLI
 # Comment this next line in to suppress the console
 -noinput +Bd
--extra --no-halt
 
 # CHANGE IT
 -env MARVIN_NERVES yes
--env MARVIN_HOST 192.168.1.120
-#-env MARVIN_HOST 192.168.1.121
--env MARVIN_PORT 4001
-#-env MARVIN_PORT 4002
-#-env MARVIN_PLATFORM ev3
--env MARVIN_PLATFORM ev3_mock
+#-env MARVIN_HOST 192.168.1.120
+-env MARVIN_HOST 192.168.1.121
+#-env MARVIN_PORT 4001
+-env MARVIN_PORT 4002
+-env MARVIN_PLATFORM ev3
+#-env MARVIN_PLATFORM ev3_mock
 -env MARVIN_PROFILE puppy
 -env MARVIN_COMMUNITY brood
--env MARVIN_PEER rodney@nerves-5e58
-#-env MARVIN_PEER marvin@nerves-2091
+#-env MARVIN_PEER rodney@nerves-5e58
+-env MARVIN_PEER marvin@nerves-2091
 -env MARVIN_PARENT_URL localhost:4003
+
+-extra --no-halt

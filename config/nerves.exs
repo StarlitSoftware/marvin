@@ -8,10 +8,13 @@ config :nerves, :firmware,
 
 # if unset, the default regulatory domain is the world domain, "00"
 config :nerves_interim_wifi,
-  regulatory_domain: "US"
+regulatory_domain: "US"
 
-# Change these options to your
-config :nerves, :wlan0,
+config :marvin, # TODO put under :marvin, :ev3
+ wifi_driver: "r8188eu"
+
+# Change these options to your  # TODO put under :marvin, :ev3
+config :marvin, :wlan0,
   ssid: "cloutiernewman",
   key_mgmt: :"WPA-PSK",
   psk: "peaksisland5725"

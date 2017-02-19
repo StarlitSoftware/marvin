@@ -12,19 +12,20 @@ defmodule Marvin.Application do
   # for more information on OTP Applications
   def start(_type, _args) do
 		Logger.info("Starting #{__MODULE__}")
-		Marvin.SmartThing.start_platform()
-		connect_to_nodes()
+		 Marvin.SmartThing.start_platform()
+	  # connect_to_nodes() # TODO
     children = [
-			supervisor(Marvin.Endpoint, []),
-			supervisor(SmartThingSupervisor, [])
+#			supervisor(Marvin.Endpoint, []),
+#			supervisor(SmartThingSupervisor, [])
     ]
     opts = [strategy: :one_for_one, name: :root_supervisor]
     result = Supervisor.start_link(children, opts)
-		SmartThingSupervisor.start_execution()
-		SmartThingSupervisor.start_perception()
-    Process.spawn(fn -> push_runtime_stats() end, [])
-		InternalClock.resume()
-		result
+		# TODO
+		# SmartThingSupervisor.start_execution()
+		# SmartThingSupervisor.start_perception()
+    # Process.spawn(fn -> push_runtime_stats() end, [])
+		# InternalClock.resume()
+		 result
   end
 
   @doc "Return ERTS runtime stats"

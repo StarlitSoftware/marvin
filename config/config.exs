@@ -60,6 +60,7 @@ path: (if (System.get_env("MARVIN_PLATFORM") || "mock_ev3") == "ev3", do: "/mnt/
 format: "$time $metadata[$level] $message\n",
 metadata: [:request_id]
 
-if (System.get_env("MARVIN_NERVES") || "no") == "yes", do: import_config "nerves.exs"
+# if (System.get_env("MARVIN_NERVES") || "no") == "yes", do:
+import_config "nerves.exs"
 
 # import_config "#{Mix.env}.exs"
