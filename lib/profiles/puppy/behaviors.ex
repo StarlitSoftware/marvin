@@ -5,7 +5,7 @@ defmodule Marvin.Puppy.Behaviors do
 	import Marvin.SmartThing.BehaviorUtils
 	alias Marvin.SmartThing.{BehaviorConfig, FSM, Transition, Percept}
 
-	@doc "Give the configurations of all benaviors to be activated by motives and driven by percepts"
+	@doc "Give the configurations of all behaviors to be activated by motives and driven by percepts"
   def behavior_configs() do
 		[
       # Reflexive behaviors

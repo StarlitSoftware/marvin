@@ -382,7 +382,6 @@ defmodule Marvin.Puppy.Perception do
 											value: %{id_channel: id_channel, current: false})
 				end)
 			new_percepts
-			nil
 	    (_,_) -> nil
     end
   end

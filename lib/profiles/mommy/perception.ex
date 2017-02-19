@@ -67,7 +67,7 @@ defmodule Marvin.Mommy.Perception do
 								value: %{is: %{feeling: :food_nearby,
 															 channel: channel},
 												 from: %{community_name: community,
-																 member_url: puppy_url}}} = percept,
+																 member_url: puppy_url}}},
 				%{percepts: percepts}) when channel != 0 ->
 				hoggings = select_memories(percepts,
 																	 about: :report,

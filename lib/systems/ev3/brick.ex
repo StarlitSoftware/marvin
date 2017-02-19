@@ -1,5 +1,4 @@
 defmodule Marvin.Ev3.Brick do
-  use Application
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications

@@ -1,4 +1,4 @@
-defmodule Marvin.Ev3Mock.UltrasonicSensor do
+defmodule Marvin.RoverMock.UltrasonicSensor do
   @moduledoc "A mock ultrasonic sensor"
 
   @behaviour Marvin.SmartThing.Sensing

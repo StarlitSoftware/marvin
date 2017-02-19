@@ -17,8 +17,8 @@
 -env MARVIN_HOST 192.168.1.121
 #-env MARVIN_PORT 4001
 -env MARVIN_PORT 4002
--env MARVIN_PLATFORM ev3
-#-env MARVIN_PLATFORM ev3_mock
+-env MARVIN_PLATFORM rover
+#-env MARVIN_PLATFORM rover_mock
 -env MARVIN_PROFILE puppy
 -env MARVIN_COMMUNITY brood
 #-env MARVIN_PEER rodney@nerves-5e58

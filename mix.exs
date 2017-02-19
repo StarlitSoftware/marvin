@@ -39,12 +39,8 @@ defmodule SmartThing.Mixfile do
   end
 
  defp nerves_apps() do
-#	 if (System.get_env("MARVIN_NERVES") || "no") == "yes" do
 		 [:nerves_interim_wifi,
 			:ex_ncurses]
-#	 else
-#		 []
-#	 end
  end
 
   # Specifies which paths to compile per environment.

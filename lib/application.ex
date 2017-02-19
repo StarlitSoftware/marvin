@@ -13,18 +13,17 @@ defmodule Marvin.Application do
   def start(_type, _args) do
 		Logger.info("Starting #{__MODULE__}")
 		 Marvin.SmartThing.start_platform()
-	  # connect_to_nodes() # TODO
+	  connect_to_nodes()
     children = [
-#			supervisor(Marvin.Endpoint, []),
-#			supervisor(SmartThingSupervisor, [])
+			supervisor(Marvin.Endpoint, []),
+			supervisor(SmartThingSupervisor, [])
     ]
     opts = [strategy: :one_for_one, name: :root_supervisor]
     result = Supervisor.start_link(children, opts)
-		# TODO
-		# SmartThingSupervisor.start_execution()
-		# SmartThingSupervisor.start_perception()
-    # Process.spawn(fn -> push_runtime_stats() end, [])
-		# InternalClock.resume()
+		SmartThingSupervisor.start_execution()
+		SmartThingSupervisor.start_perception()
+    Process.spawn(fn -> push_runtime_stats() end, [])
+		InternalClock.resume()
 		 result
   end
 

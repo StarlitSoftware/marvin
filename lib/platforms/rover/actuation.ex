@@ -1,5 +1,5 @@
-defmodule Marvin.Ev3.Actuation do
-	@moduledoc "Provides the configurations of all EV3 robot actuators to be activated"
+defmodule Marvin.Rover.Actuation do
+	@moduledoc "Provides the configurations of all rover actuators to be activated"
 
 	require Logger
 
@@ -7,7 +7,7 @@ defmodule Marvin.Ev3.Actuation do
 	alias Marvin.SmartThing
   import Marvin.SmartThing.Utils
 	
-	@doc "Give the configurations of all actuators to be activated"
+	@doc "Give the configurations of all Rover actuators"
   def actuator_configs() do
 		[
 			ActuatorConfig.new(name: :locomotion,
@@ -40,10 +40,10 @@ defmodule Marvin.Ev3.Actuation do
 			ActuatorConfig.new(name: :leds,
 												 type: :led,
 												 specs: [
-													 %LEDSpec{name: :lr, position: :left, color: :red}, #ev3
-													 %LEDSpec{name: :lg, position: :left, color: :green}, #ev3
-													 %LEDSpec{name: :rr, position: :right, color: :red}, #ev3
-													 %LEDSpec{name: :rg, position: :right, color: :green}, #ev3
+													 %LEDSpec{name: :lr, position: :left, color: :red}, 
+													 %LEDSpec{name: :lg, position: :left, color: :green},
+													 %LEDSpec{name: :rr, position: :right, color: :red}, 
+													 %LEDSpec{name: :rg, position: :right, color: :green}, 
 												 ],
 												 activations: [
 													 %Activation{intent: :green_lights,
