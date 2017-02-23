@@ -31,14 +31,24 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 
 
-# Configures the endpoint
 config :marvin,
 platforms: %{"mock_rover" => Marvin.MockRover.Platform,
 						 "rover" => Marvin.Rover.Platform,
 						 "hub" => Marvin.Hub.Platform},
 profiles: %{"puppy" => Marvin.Puppy.Profile,
-						"mommy" => Marvin.Mommy.Profile}
+						"mommy" => Marvin.Mommy.Profile},
+max_percept_age: 2000,
+max_motive_age: 3000,
+max_intent_age: 1500,
+strong_intent_factor: 3,
+max_beacon_channels: 3,
+very_fast_rps: 3,
+fast_rps: 2,
+normal_rps: 1,
+slow_rps: 0.5,
+very_slow_rps: 0.3
 
+# Configures the endpoint
 config :marvin, Marvin.Endpoint,
 url: [host: (System.get_env("MARVIN_HOST") || "localhost"),
 			port: String.to_integer(System.get_env("MARVIN_PORT") || "4000")],

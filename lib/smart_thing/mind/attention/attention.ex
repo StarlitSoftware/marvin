@@ -90,7 +90,7 @@ defmodule Marvin.SmartThing.Attention do
 			fn(sensing_device, acc) ->
 				apply(sensing_device.mod, :senses, [sensing_device]) ++ acc
 			end) |> Enum.uniq()
-		Logger.debug("ALL DETECTED senses for #{inspect sensing_devices} => #{inspect senses}")
+		Logger.info("ALL DETECTED senses for #{inspect sensing_devices} => #{inspect senses}")
 		senses
 	end
 	
@@ -108,18 +108,43 @@ defmodule Marvin.SmartThing.Attention do
 			attended_senses
 		else
 			on_motives = Memory.on_motives()
+			Logger.info("On motives = #{inspect(Enum.map(on_motives, &(&1.about)))}")
 			attended_motive_senses = attended_motive_senses(on_motives, motivator_configs)
+			Logger.info("Motive senses = #{inspect attended_motive_senses}")
 			attended_behavior_senses =	attended_behavior_senses(on_motives, behavior_configs)
-			all_attended_senses = Enum.reduce(attended_motive_senses ++ attended_behavior_senses,
+			Logger.info("Behavior senses = #{inspect attended_behavior_senses}")
+			senses = Enum.reduce(attended_motive_senses ++ attended_behavior_senses,
 																				[],
 				fn(top_sense, acc) ->
-					detected_perceptor_senses_for(top_sense, perceptor_configs, detected_senses) ++
-					awakened_senses_for_communicator_sense(top_sense, communicators, detected_senses) ++
+					detected_perceptor_senses_for(top_sense, perceptor_configs) ++
+					awakened_senses_for_communicator_sense(top_sense, communicators) ++
 						acc
-				end) |> Enum.uniq()
-			Logger.info("ALL ATTENDED senses => #{inspect all_attended_senses}")
+				end)
+			|> Enum.uniq()
+			all_attended_senses = Enum.reduce(detected_senses,
+																				[],
+				fn(detected_sense, acc) ->
+					if Enum.any?(senses, &(senses_match?(detected_sense, &1))) do
+						[detected_sense | acc]
+					else
+						acc
+					end
+				end)
+			Logger.info("ATTENDED senses => #{inspect all_attended_senses}")
 			all_attended_senses
 		end
+	end
+
+	defp senses_match?({sense, _qualifier}, sense) do
+		true
+	end
+
+	defp senses_match?(sense, sense) do
+		true
+	end
+
+	defp senses_match?(_, _) do
+		false
 	end
 
 	defp attended_motive_senses(on_motives, motivator_configs) do
@@ -146,12 +171,13 @@ defmodule Marvin.SmartThing.Attention do
 
 	defp attended_behavior_senses(on_motives, behavior_configs) do
 		reflex_behavior_names = reflex_behavior_names(behavior_configs)
-		transited_behavior_names = Memory.transited_behavior_names() #i.e. just transited and not stopped
+		started_behavior_names = Memory.started_behavior_names() #i.e. not stopped
 		inhibited_motive_names = inhibited_motive_names(on_motives)
-		active_behavior_names = Enum.reject(transited_behavior_names,
+		active_behavior_names = Enum.reject(started_behavior_names,
 			fn(behavior_name) ->
 				Enum.any?(inhibited_motive_names, &(behavior_motivated_by?(behavior_name, &1, behavior_configs)))
 			end)
+		Logger.info("Active behavior names #{inspect active_behavior_names}")
 		Enum.reduce(reflex_behavior_names ++ active_behavior_names,
 								[],
 			fn(behavior_name, acc) ->
@@ -183,43 +209,34 @@ defmodule Marvin.SmartThing.Attention do
 			end)
 	end
 
-	defp awakened_senses_for_communicator_sense(sense, communicators, detected_senses) do
+	defp awakened_senses_for_communicator_sense(sense, communicators) do
 		Enum.reduce(communicators,
 								[],
 			fn(communicator, acc) ->
 				apply(communicator.mod, :senses_awakened_by, [sense]) ++ acc
 			end)
 		|> Enum.uniq
-		|> Enum.filter(&(&1 in detected_senses))
 	end
 
-	defp detected_perceptor_senses_for(sense, perceptor_configs, detected_senses) do
-		expand_sense(sense, perceptor_configs,  [])
-		|> Enum.uniq
-		|> Enum.filter(&(&1 in detected_senses))
+	defp detected_perceptor_senses_for(sense, perceptor_configs) do
+		expand_sense(sense, perceptor_configs,  []) |> Enum.uniq
 	end
 
 	defp expand_sense(sense, perceptor_configs, results) do
-		expanded = case perceptor_config_named(sense, perceptor_configs) do
-								 nil ->
-									 [sense | results]
-								 perceptor_config ->
-									 case Enum.reject(perceptor_config.focus.senses, &(&1 in results)) do
-										 [] ->
-											 results
-										 sub_senses ->
-											 Enum.reduce(sub_senses,
-																	 results ++ sub_senses,
-												 fn(sub_sense, acc) ->
-													 expand_sense(sub_sense, perceptor_configs, acc)
-												 end)
-									 end
-							 end
-		expanded
+		Enum.filter(perceptor_configs, &(sense in &1.generates))
+    |> Enum.reduce(results,
+			fn(perceptor_config, acc) ->
+				case Enum.reject(perceptor_config.focus.senses, &(&1 in acc)) do
+					[] ->
+						acc
+					sub_senses ->
+						Enum.reduce(sub_senses,
+												acc ++ sub_senses,
+							fn(sub_sense, acc1) ->
+								expand_sense(sub_sense, perceptor_configs, acc1)
+							end)
+				end				
+			end)
 	end
-
-	defp perceptor_config_named(sense, perceptor_configs) do
-		Enum.find(perceptor_configs, &(&1.name == sense))
-	end				
 
 end

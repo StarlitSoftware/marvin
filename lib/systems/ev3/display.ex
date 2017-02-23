@@ -18,7 +18,7 @@ defmodule Marvin.Ev3.Display do
     N.clear()
     N.refresh()
     :timer.send_interval(@refresh_interval, :refresh)
-    {:ok, "Started"}
+    {:ok, "Hello world!"}
   end
 
   def terminate(_reason, _state) do

@@ -16,12 +16,12 @@ defmodule Marvin.Application do
 		Logger.info("Starting #{__MODULE__}")
 		Marvin.SmartThing.start_platform()
     children = [
-			# supervisor(Marvin.Endpoint, []),
-			# supervisor(SmartThingSupervisor, [])
+			supervisor(Marvin.Endpoint, []),
+			supervisor(SmartThingSupervisor, [])
     ]
     opts = [strategy: :one_for_one, name: :root_supervisor]
     result = Supervisor.start_link(children, opts)
-	#	spawn_link(fn() -> go_when_platform_ready() end)
+		spawn_link(fn() -> go_when_platform_ready() end)
 		result
   end
 

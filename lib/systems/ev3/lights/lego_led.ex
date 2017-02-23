@@ -70,7 +70,7 @@ defmodule Marvin.Ev3.LegoLED do
 	end
 
 	defp module_for_type(_type) do
-		Ev3.LegoLED
+		Marvin.Ev3.LegoLED
 	end
 
 	defp init_ev3_led(dir_name, path) do

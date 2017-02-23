@@ -1,7 +1,6 @@
 defmodule Marvin.SmartThing.SoundPlayer do
 	@moduledoc "A Linux sound player"
 
-	alias Marvin.SmartThing
 	alias Marvin.SmartThing.Device
 	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
 	require Logger
@@ -31,14 +30,10 @@ defmodule Marvin.SmartThing.SoundPlayer do
 	
   @doc "Speak out words with a given volume, speed and voice"
   def speak(words, volume, speed, v \\ nil) do
-		if SmartThing.system() == "pc" do
-			voice = v || platform_dispatch(:voice)
-			args =  ["-a", "#{volume}", "-s", "#{speed}", "-v", "#{voice}", words]
-			System.cmd("espeak", args)
-		else
-			SmartThing.display(words)
-		end
-  end
+		voice = v || platform_dispatch(:voice)
+		args =  ["-a", "#{volume}", "-s", "#{speed}", "-v", "#{voice}", words]
+		System.cmd("espeak", args)
+	end
 
   @doc "Speak words loud and clear"
   def speak(words) do

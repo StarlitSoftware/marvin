@@ -125,7 +125,6 @@ defmodule Marvin.Ev3.Tachomotor do
   def set_speed(motor, :dps, value) when is_number(value) do
 		count_per_sec = round(value * count_per_rot(motor) / 360)
 		motor
-		|> set_control(:speed_regulation, :on)
     |> set_control(:speed_mode, :dps)
 		|> set_control(:speed, count_per_sec)
   end
@@ -134,7 +133,6 @@ defmodule Marvin.Ev3.Tachomotor do
   def set_speed(motor, :rps, value) when is_number(value) do
 		count_per_sec = round(value * count_per_rot(motor))
 		motor
-		|> set_control(:speed_regulation, :on)
     |> set_control(:speed_mode, :rps)
 		|> set_control(:speed, count_per_sec)
   end
@@ -268,6 +266,10 @@ defmodule Marvin.Ev3.Tachomotor do
 		Map.get(motor.props, :count_per_rot)
   end
 
+	defp max_speed(motor) do
+		Map.get(motor.props, :max_speed)
+	end
+
   defp has_state?(motor, state) do
 		states = get_attribute(motor, "state", :string)
 		state in String.split(states, " ")
@@ -281,11 +283,11 @@ defmodule Marvin.Ev3.Tachomotor do
 	end
 
 	defp apply_motor_controls(motor) do
-		set_attribute(motor, "speed_regulation", get_control(motor, :speed_regulation))
-		speed = case motor.type do
-							:large -> min(get_control(motor, :speed), 900)
-							:medium -> min(get_control(motor, :speed), 1200)
-						end
+		# speed = case motor.type do
+		# 					:large -> min(get_control(motor, :speed), 900)
+		# 					:medium -> min(get_control(motor, :speed), 1200)
+		# 				end
+		speed = min(get_control(motor, :speed), max_speed(motor))
 		set_attribute(motor, "speed_sp", speed)
 		set_attribute(motor, "duty_cycle_sp", get_control(motor, :duty_cycle))
 		set_attribute(motor, "polarity", get_control(motor, :polarity))

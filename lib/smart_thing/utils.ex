@@ -4,10 +4,49 @@ defmodule Marvin.SmartThing.Utils do
 
 	alias Marvin.SmartThing
 
+	def max_percept_age() do
+		Application.fetch_env!(:marvin, :max_percept_age)
+	end
+
+	def max_motive_age() do
+		Application.fetch_env!(:marvin, :max_motive_age)
+	end
+
+	def max_intent_age() do
+		Application.fetch_env!(:marvin, :max_intent_age)
+	end
+
+	def strong_intent_factor() do
+		Application.fetch_env!(:marvin, :strong_intent_factor)
+	end
+
+	def max_beacon_channels() do
+		Application.fetch_env!(:marvin, :max_beacon_channels)
+	end		
+
+	def very_fast_rps() do
+		Application.fetch_env!(:marvin, :very_fast_rps)
+	end		
+
+	def fast_rps() do
+		Application.fetch_env!(:marvin, :fast_rps)
+	end		
+
+	def normal_rps() do
+		Application.fetch_env!(:marvin, :normal_rps)
+	end		
+
+	def slow_rps() do
+		Application.fetch_env!(:marvin, :slow_rps)
+	end		
+
+	def very_slow_rps() do
+		Application.fetch_env!(:marvin, :very_slow_rps)
+	end		
+
 	@doc "The time now in msecs"
 	def now() do
-		{mega, secs, micro} = :os.timestamp()
-		((mega * 1_000_000) + secs) * 1000 + div(micro, 1000)
+		div(:os.system_time(), 1_000_000)
 	end
 
   @doc "Supported time units"

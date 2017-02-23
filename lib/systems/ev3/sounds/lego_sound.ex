@@ -5,6 +5,7 @@ defmodule Marvin.Ev3.LegoSound do
 
   require Logger
   alias Marvin.SmartThing.Device
+	alias Marvin.SmartThing
 
   @sys_path "/sound"
 
@@ -42,8 +43,9 @@ defmodule Marvin.Ev3.LegoSound do
 	
   @doc "Speak out words with a given volume, speed and voice"
   def speak(words, volume, speed, voice \\ "en") do
-		:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}" --stdout | aplay')
-		:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}"')
+		# :os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}" --stdout | aplay')
+		# :os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}"')
+		SmartThing.display(words)
   end
 
   @doc "Speak words loud and clear"

@@ -22,13 +22,13 @@ defmodule Marvin.SmartThing.AttentionHandler do
 		{:ok, state}
 	end
 
-	def handle_event({:behavior_stopped, _name, reflex?}, state) do
+	def handle_event({:behavior_stopped, _behavior_name, reflex?}, state) do
 		if not reflex?, do: Attention.reset()
 		{:ok, state}
 	end
 
-	def handle_event({:behavior_transited, _behavior_name, _to_state_name}, state) do
-		Attention.reset()
+	def handle_event({:behavior_started, _behavior_name, reflex?}, state) do
+		if not reflex?, do: Attention.reset()
 		{:ok, state}
 	end
 

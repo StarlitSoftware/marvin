@@ -2,9 +2,8 @@ defmodule Marvin.SmartThing.Perceptor do
 	@moduledoc "An analyzer and producer of percepts"
 
 	alias Marvin.SmartThing.{Memory, CNS, Percept}
+	import Marvin.SmartThing.Utils
 	require Logger
-  
-	@max_percept_age 1000 # 1000
 
 	@doc "Start a perceptor from a configuration"
 	def start_link(perceptor_config) do
@@ -59,7 +58,7 @@ defmodule Marvin.SmartThing.Perceptor do
 
    defp check_freshness(name, percept) do
     age = Percept.age(percept)
-     if age > @max_percept_age do
+     if age > max_percept_age() do
 			 if not Percept.transient?(percept) do
 				 Logger.warn("STALE percept #{inspect percept.about} #{age}")
 				 CNS.notify_overwhelmed(:perceptor, name)

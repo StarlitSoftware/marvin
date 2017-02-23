@@ -9,7 +9,7 @@ defmodule Marvin.Ev3.Brick do
     load_ev3_modules()
     start_writable_fs()
     start_wifi()
-
+    init_alsa()
     # Define workers and child supervisors to be supervised
     children = [
       worker(Marvin.Ev3.Display, []),
@@ -33,6 +33,10 @@ defmodule Marvin.Ev3.Brick do
   end
  
 	### PRIVATE
+
+	defp init_alsa() do
+		System.cmd("alsactl", ["restore"])
+	end
 	
   defp load_ev3_modules() do
 		wifi_driver = Application.get_env(:marvin, :wifi_driver)

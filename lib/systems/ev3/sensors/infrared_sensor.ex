@@ -2,6 +2,7 @@ defmodule Marvin.Ev3.InfraredSensor do
 	@moduledoc "Infrared sensor"
 	@behaviour Marvin.SmartThing.Sensing
 
+	import Marvin.SmartThing.Utils
 	import Marvin.Ev3.Sysfs
 	alias Marvin.Ev3.LegoSensor
 	require Logger
@@ -9,12 +10,11 @@ defmodule Marvin.Ev3.InfraredSensor do
 	@proximity "IR-PROX"
 	@seek "IR-SEEK"
   @remote "IR-REMOTE"
-  @max_beacon_channels 4
 	
 	### Sensing behaviour
 	
 	def senses(_) do
-		beacon_senses = Enum.reduce(1 .. @max_beacon_channels,
+		beacon_senses = Enum.reduce(1 .. max_beacon_channels(),
 																[],
 			fn(channel, acc) ->
 				acc ++
@@ -75,7 +75,7 @@ defmodule Marvin.Ev3.InfraredSensor do
   end
 
 	@doc "Get beacon heading on a channel (-25 for far left, 25 for far right, 0 if absent or straight ahead)"
-  def seek_heading(sensor, channel) when channel in 1 .. @max_beacon_channels do 
+  def seek_heading(sensor, channel)  do 
 	updated_sensor = set_seek_mode(sensor)
 	value = get_attribute(updated_sensor, "value#{(channel - 1) * 2}", :integer)
 	{value, updated_sensor}
@@ -83,22 +83,22 @@ defmodule Marvin.Ev3.InfraredSensor do
 
 	@doc "Get beacon distance on a channel 
   (as percentage, or -128 if absent)"
-  def seek_distance(sensor, channel) when channel in 1 .. @max_beacon_channels do
+  def seek_distance(sensor, channel) do
 		updated_sensor = set_seek_mode(sensor)
 		value = get_attribute(updated_sensor, "value#{((channel - 1) * 2) + 1}", :integer)
 		{value, updated_sensor}
   end
 
   @doc "Is the beacon on in seek mode?"
-	def seek_beacon_on?(sensor, channel) when channel in 1 .. @max_beacon_channels do
+	def seek_beacon_on?(sensor, channel) do
 		{distance, sensor1} = seek_distance(sensor, channel)
 		{heading, sensor2} =  seek_heading(sensor1, channel)
-		{distance == -128 && heading == 0, sensor2}
+		{not(distance == -128 && heading == 0), sensor2}
   end
 
 	@doc "Get remote button pushed (maximum two buttons) on a channel. 
   (E.g. %{red: :up, blue: :down}, or %{red: :up_down, blue: nil}"
-  def remote_buttons(sensor, channel) when channel in 1 .. @max_beacon_channels do
+  def remote_buttons(sensor, channel) do
 		updated_sensor = set_remote_mode(sensor)
 		val = get_attribute(updated_sensor, "value#{channel - 1}", :integer)
 		value = case val do
@@ -118,13 +118,13 @@ defmodule Marvin.Ev3.InfraredSensor do
   end
 
 	@doc "Are one or more remote button pushed on a given channel?"
-  def remote_pushed?(sensor, channel) when channel in 1 .. @max_beacon_channels do
+  def remote_pushed?(sensor, channel) do
 		{%{red: red, blue: blue}, updated_sensor} = remote_buttons(sensor, channel)
 		{red != nil || blue != nil, updated_sensor}
   end
 
 	@doc "Is the beacon turned on on a given channel in remote mode?"
-  def remote_beacon_on?(sensor, channel) when channel in 1 .. @max_beacon_channels do
+  def remote_beacon_on?(sensor, channel) do
 		updated_sensor = set_remote_mode(sensor)
 		value = get_attribute(updated_sensor, "value#{channel - 1}", :integer) == 9
 		{value, updated_sensor}

@@ -10,6 +10,7 @@ defmodule Marvin.Mommy.Perception do
 			# The brood is panicking out of control
 			PerceptorConfig.new(
 				name: :out_control_panicking,
+				generates: [:out_of_control_panicking],
 				focus: %{senses: [:report], motives: [], intents: []},
 				span: {30, :secs},
 				ttl: {30, :secs},
@@ -17,6 +18,7 @@ defmodule Marvin.Mommy.Perception do
 			# A pup is hogging food from a hungry sibling
 			PerceptorConfig.new(
 				name: :food_hogging,
+				generates: [:food_hogging],
 				focus: %{senses: [:report], motives: [], intents: []},
 				span: {30, :secs},
 				ttl: {30, :secs},

@@ -13,6 +13,7 @@ defmodule Marvin.Puppy.Perception do
 				# A getting lighter/darker perceptor
 				PerceptorConfig.new(
 					name: :light,
+					generates: [:light],
 					focus: %{senses: [:ambient], motives: [], intents: []},
 					span: {10, :secs},
 					ttl: {10, :secs},
@@ -20,6 +21,7 @@ defmodule Marvin.Puppy.Perception do
 				# A collision perceptor based on distance sensing
 				PerceptorConfig.new(
 					name: :collision,
+					generates: [:collision],
 					focus: %{senses: [:distance, :touch, :collision, :time_elapsed], motives: [], intents: []},
 					span: nil, # no windowing
 					ttl: {10, :secs}, # remember for 10 seconds
@@ -27,6 +29,7 @@ defmodule Marvin.Puppy.Perception do
 				# Sensing danger
 				PerceptorConfig.new(
 					name: :danger,
+					generates: [:danger],
 					focus: %{senses: [:ambient, :collision, :danger, :time_elapsed], motives: [], intents: []},
 					span: {10, :secs}, # only react to what happened in the last 10 seconds
 					ttl: {30, :secs}, # remember for 30 secs
@@ -34,6 +37,7 @@ defmodule Marvin.Puppy.Perception do
 				# Hunger pangs
 				PerceptorConfig.new(
 					name: :hungry,
+					generates: [:hungry],
 					focus: %{senses: [:time_elapsed], motives: [], intents: [:eat]},
 					span: {1, :mins},
 					ttl: {30, :secs},
@@ -41,6 +45,7 @@ defmodule Marvin.Puppy.Perception do
 				# A food perceptor
 				PerceptorConfig.new(
 					name: :food,
+					generates: [:food],
 					focus: %{senses: [:ambient, :color], motives: [], intents: []},
 					span: {10, :secs},
 					ttl: {30, :secs},
@@ -48,6 +53,7 @@ defmodule Marvin.Puppy.Perception do
 				# An odor perceptor
 				PerceptorConfig.new(
 					name: :scent,
+					generates: [:scent_strength, :scent_direction],
 					focus: %{senses: [:beacon_heading, :beacon_distance, :scent_strength], motives: [], intents: []},
 					span: {10, :secs},
 					ttl: {30, :secs},
@@ -55,6 +61,7 @@ defmodule Marvin.Puppy.Perception do
 				# A food is near perceptor
 				PerceptorConfig.new(
 					name: :food_nearby,
+					generates: [:food_nearby],
 					focus: %{senses: [:scent_strength], motives: [], intents: []},
 					span: {10, :secs},
 					ttl: {10, :secs},
@@ -62,6 +69,7 @@ defmodule Marvin.Puppy.Perception do
 				# A stuck perceptor
 				PerceptorConfig.new(
 					name: :stuck,
+					generates: [:stuck],
 					focus: %{senses: [:beacon_distance], motives: [], intents: [:go_forward, :go_backward]},
 					span: {10, :secs},
 					ttl: {10, :secs},
@@ -69,6 +77,7 @@ defmodule Marvin.Puppy.Perception do
         # A "someone is panicking and I am not in danger" perceptor
 				PerceptorConfig.new(
 					name: :other_panicking,
+					generates: [:danger],
 					focus: %{senses: [:heard, :danger], motives: [], intents: [:say_scared]},
 					span: {10, :secs},
 					ttl: {10, :secs},
@@ -77,6 +86,7 @@ defmodule Marvin.Puppy.Perception do
 				# Also "I no longer hear some other eat that got me greedy" perceptor
 				PerceptorConfig.new(
 					name: :other_eating,
+					generates: [:other_eating],
 					focus: %{senses: [:heard, :food, :time_elapsed], motives: [], intents: []},
 					span: {10, :secs},
 					ttl: {10, :secs},

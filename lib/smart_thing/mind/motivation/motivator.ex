@@ -2,9 +2,8 @@ defmodule Marvin.SmartThing.Motivator do
 	@moduledoc "An analyzer of percepts and producer of motives"
 
 	require Logger
+	import Marvin.SmartThing.Utils
 	alias Marvin.SmartThing.{Memory, CNS, Percept}
-
- 	@max_percept_age 2000 # 2000
 
 	@doc "Start a motivator from a configuration"
 	def start_link(motivator_config) do
@@ -33,7 +32,7 @@ defmodule Marvin.SmartThing.Motivator do
 
   defp check_freshness(name, percept) do
     age = Percept.age(percept)
-    if age  > @max_percept_age do
+    if age  > max_percept_age() do
 			if not Percept.transient?(percept) do
 				Logger.warn("STALE percept #{inspect percept.about} #{age}")
 				CNS.notify_overwhelmed(:motivator, name)

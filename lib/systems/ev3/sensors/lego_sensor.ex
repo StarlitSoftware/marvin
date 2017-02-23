@@ -116,7 +116,6 @@ defmodule Marvin.Ev3.LegoSensor do
 	end
 
   defp init_sensor(path) do
-		Logger.info("Initializing sensor at #{path}")
 		port_name = read_sys(path, "address")
     driver_name = read_sys(path, "driver_name")
     [_, type_name] = Regex.run(@driver_regex, driver_name)
@@ -132,7 +131,6 @@ defmodule Marvin.Ev3.LegoSensor do
 										 path: path, 
 										 port: port_name, 
 										 type: type}
-		Logger.info("INITIALIZED SENSOR #{sensor.type} to #{inspect sensor}")
 		mode = get_attribute(sensor, "mode", :string)
     %Device{sensor | props: %{mode: mode}}    
   end

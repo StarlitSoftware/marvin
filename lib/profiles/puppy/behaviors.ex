@@ -81,7 +81,7 @@ defmodule Marvin.Puppy.Behaviors do
 			BehaviorConfig.new( # look for food in bright places
 				name: :foraging,
 				motivated_by: [:hunger],
-				senses: [:food, :scent_strength, :scent_direction],
+				senses: [:food, :scent_strength, :scent_direction, :time_elapsed],
 				fsm: %FSM{
 					initial_state: :started,
 					final_state: :ended,
@@ -91,6 +91,8 @@ defmodule Marvin.Puppy.Behaviors do
 						%Transition{from: [:started, :on_scent],
 												on: :scent_strength,
 												to: :on_scent,
+												 condition: fn({_value, channel}, _sense_qualifier, _motives) ->
+                           channel == 1 end,
 												doing: stay_the_course() # faster or slower according to closer or farther
 											 },
 						%Transition{from: [:off_scent],
@@ -124,7 +126,7 @@ defmodule Marvin.Puppy.Behaviors do
 												on: :food,
 												 condition: fn(value, _sense_qualifier, _motives) -> value == :none end,
 											 to: :off_scent,
-											 doing: backoff(false)
+											 doing: stop_eating()
 											 },
 						%Transition{to: :ended,
 												doing: turn_on_green_leds()
@@ -136,7 +138,7 @@ defmodule Marvin.Puppy.Behaviors do
 			BehaviorConfig.new( # Track another community member to compete for a food source
 				name: :tracking,
 				motivated_by: [:greed],
-				senses: [:food, :food_nearby, :scent_strength, :scent_direction],
+				senses: [:food, :food_nearby, :scent_strength, :scent_direction, :time_elapsed],
 				fsm: %FSM{
 					initial_state: :started,
 					final_state: :ended,
@@ -146,6 +148,12 @@ defmodule Marvin.Puppy.Behaviors do
 						%Transition{from: [:started, :on_track],
 												on: :scent_strength,
 												to: :on_track,
+												 condition: fn({_orientation, _value, _former_strength, channel}, _sense_qualifier, motives) ->
+                           case find_motive(motives, :greed) do
+                             nil -> false
+                             motive -> Map.get(motive.details, :id_channel) == channel
+                           end
+                         end,
 												doing: stay_the_course() # faster or slower according to closer or farther
 											 },
 						%Transition{from: [:off_track],
@@ -318,8 +326,8 @@ defmodule Marvin.Puppy.Behaviors do
 			Logger.info("STAYING THE COURSE from #{percept.about} = #{inspect percept.value}")
 			speed = case value do
 								:unknown-> :very_fast
-								:very_weak -> :very_fast
-								:weak -> :fast
+								:very_weak -> :fast
+								:weak -> :normal
 								:strong -> :slow
 							  :very_strong -> :very_slow
 							end
@@ -361,9 +369,9 @@ defmodule Marvin.Puppy.Behaviors do
 		fn(_percept, _state) ->
       Logger.info("START FORAGING")
       green_lights()
-      generate_intent(:say_hungry)
-			generate_intent(:broadcast, %{doing: :foraging})
-			generate_intent(:report, %{doing: :foraging})
+      generate_strong_intent(:say_hungry)
+			generate_strong_intent(:broadcast, %{doing: :foraging})
+			generate_strong_intent(:report, %{doing: :foraging})
     end
   end
 
@@ -371,9 +379,9 @@ defmodule Marvin.Puppy.Behaviors do
 		fn(_percept, _state) ->
       Logger.info("START TRACKING")
       green_lights()
-      generate_intent(:say_tracking)
-			generate_intent(:broadcast, %{doing: :tracking})
-			generate_intent(:report, %{doing: :tracking})
+      generate_strong_intent(:say_tracking)
+			generate_strong_intent(:broadcast, %{doing: :tracking})
+			generate_strong_intent(:report, %{doing: :tracking})
     end
    end
 
@@ -398,6 +406,14 @@ defmodule Marvin.Puppy.Behaviors do
 			generate_intent(:broadcast, %{doing: :eating})
 			generate_intent(:report, %{doing: :eating})
 			generate_intent(:eat, how_much)
+		end
+	end
+
+	defp stop_eating() do
+		fn(_, _) ->
+			Logger.info("STOP EATING")
+		  generate_intent(:say_full)
+      intend_backoff(false)
 		end
 	end
 
@@ -458,6 +474,7 @@ defmodule Marvin.Puppy.Behaviors do
 	def calm_down() do
 		fn(_percept, _state) ->
 			Logger.info("CALMING DOWN")
+      generate_strong_intent(:say_ok_now)
 			green_lights()
 		end
 	end

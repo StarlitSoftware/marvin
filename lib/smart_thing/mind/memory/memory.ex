@@ -28,6 +28,10 @@ defmodule Marvin.SmartThing.Memory do
 		GenServer.cast(@name, {:store_behavior_stopped, behavior_name})
 	end
 
+	def store_behavior_started(behavior_name) do
+		GenServer.cast(@name, {:store_behavior_started, behavior_name})
+	end
+
 	def store_behavior_transited(behavior_name, to_state_name) do
 		GenServer.cast(@name, {:store_behavior_transited, behavior_name, to_state_name})
 	end
@@ -67,9 +71,9 @@ defmodule Marvin.SmartThing.Memory do
 		GenServer.call(@name, :on_motives)
 	end
 
-	@doc "Get the names of all active, non-inhibited behaviors"
-	def transited_behavior_names() do
-		GenServer.call(@name, :transited_behavior_names)
+	@doc "Get the names of all started behaviors"
+	def started_behavior_names() do
+		GenServer.call(@name, :started_behavior_names)
 	end
 
 	### CALLBACKS
@@ -119,6 +123,11 @@ defmodule Marvin.SmartThing.Memory do
 
 	def handle_cast({:store_behavior_stopped, behavior_name}, %{behaviors: behaviors} = state) do
 		new_state = %{state | behaviors: behavior_stopped(behaviors, behavior_name)}
+		{:noreply, new_state}
+	end
+
+	def handle_cast({:store_behavior_started, behavior_name}, %{behaviors: behaviors} = state) do
+		new_state = %{state | behaviors: behavior_started(behaviors, behavior_name)}
 		{:noreply, new_state}
 	end
 
@@ -178,7 +187,7 @@ defmodule Marvin.SmartThing.Memory do
 		{:reply, on_motives, state}
 	end
 
-	def handle_call(:transited_behavior_names, _from, %{behaviors: behaviors} = state) do
+	def handle_call(:started_behavior_names, _from, %{behaviors: behaviors} = state) do
 		{:reply, Map.keys(behaviors), state}
 	end
 
@@ -383,6 +392,10 @@ defmodule Marvin.SmartThing.Memory do
 		)
 	end
 	
+	defp behavior_started(behaviors, behavior_name) do
+		Map.put(behaviors, behavior_name, nil)
+	end
+
 	defp behavior_transited(behaviors, behavior_name, to_state_name) do
 		Map.put(behaviors, behavior_name, to_state_name)
 	end

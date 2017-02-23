@@ -77,8 +77,8 @@ defmodule Marvin.Ev3.LegoMotor do
 			ramp_up: get_attribute(motor, "ramp_up_sp", :integer),
 			ramp_down: get_attribute(motor, "ramp_down_sp", :integer),
 			position: get_attribute(motor, "position_sp", :integer), # in counts,
-	 	  time: get_attribute(motor, "time_sp", :integer),
-		  speed_regulation: get_attribute(motor, "speed_regulation", :atom)}
+	 	  time: get_attribute(motor, "time_sp", :integer)
+			}
   end
 
 	### PRIVATE
@@ -88,7 +88,7 @@ defmodule Marvin.Ev3.LegoMotor do
 	end
 
 	defp module_for_type(_type) do
-		Ev3.Tachomotor
+		Marvin.Ev3.Tachomotor
 	end
 	
   defp init_motor(path) do
@@ -107,7 +107,9 @@ defmodule Marvin.Ev3.LegoMotor do
     count_per_rot = get_attribute(motor, "count_per_rot", :integer)
     commands = get_attribute(motor, "commands", :list)
 		stop_actions = get_attribute(motor, "stop_actions", :list)
-    %Device{motor | props: %{count_per_rot: count_per_rot, 
+		max_speed = get_attribute(motor, "max_speed", :integer)
+    %Device{motor | props: %{count_per_rot: count_per_rot,
+														 max_speed: max_speed,
 														 commands: commands,
 														 stop_actions: stop_actions,
 														 controls: Map.put_new(get_sys_controls(motor), 
@@ -116,4 +118,3 @@ defmodule Marvin.Ev3.LegoMotor do
   end
 
 end
-

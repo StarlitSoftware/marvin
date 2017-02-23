@@ -1,4 +1,4 @@
-defmodule Ev3.ColorSensor do
+defmodule Marvin.Ev3.ColorSensor do
 	@moduledoc "Color sensor"
 	@behaviour Marvin.SmartThing.Sensing
 

@@ -30,12 +30,13 @@ defmodule Marvin.SmartThing.InternalClock do
       fn(state) ->
         if state.responsive do
           tock = now()
+          Logger.info("tick")
 					CNS.notify_tick()
           Percept.new_transient(about: :time_elapsed, value: tock - state.tock)
           |> CNS.notify_perceived()
-          Logger.info("tick")
           %{state | tock: tock}
         else
+					Logger.info(" no tick")
           state
         end
       end)

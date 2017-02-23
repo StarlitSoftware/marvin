@@ -5,7 +5,11 @@ defmodule Marvin.SmartThing.BehaviorUtils do
 
 	require Logger
 
-  def generate_intent(about) do
+	def generate_strong_intent(about, value \\ nil) do
+		generate_intent(about, value, true)
+	end
+
+	def generate_intent(about) do
     generate_intent(about, nil)
   end
   

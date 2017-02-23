@@ -60,8 +60,8 @@ defmodule Marvin.Puppy.Motivation do
 	@doc "Hunger motivation"
 	def hunger() do
 		fn
-		(%Percept{about: :hungry, value: :very}, %{percepts: percepts }) ->
-			no_danger? = not any_memory?(percepts, :danger, 5_000, fn(_value) -> true end)
+			(%Percept{about: :hungry, value: :very}, %{percepts: percepts }) ->
+			no_danger? = not any_memory?(percepts, :danger, 5_000, fn(value) -> value == :high end)
 			mom_allows? = not any_memory?(percepts,
 																	 :mom_says,
 																	 5_000,
@@ -72,11 +72,11 @@ defmodule Marvin.Puppy.Motivation do
 						_ ->
 							false
 					end
-					end)
-			if no_danger? && mom_allows? do
-					Motive.on(:hunger) |> Motive.inhibit(:curiosity)
-				else
-					Motive.off(:hunger)
+				end)
+			if no_danger? and mom_allows? do
+				Motive.on(:hunger) |> Motive.inhibit(:curiosity)
+			else
+				nil
 			end
 			(%Percept{about: :mom_says, value: %{is: %{command: :stop_eating}}}, _) ->
 				Motive.off(:hunger)

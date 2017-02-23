@@ -3,10 +3,7 @@ defmodule Marvin.SmartThing.Actuator do
 
 	require Logger
 	alias Marvin.SmartThing.{Script, Device, MotorSpec, LEDSpec, SoundSpec, CommSpec, Communicators, CNS, Intent}
-	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1]
-
-	@max_intent_age 2000 # 2000 # intents older than 1 sec are stale 
-  @strong_intent_factor 2 # strong intents last longer before becoming stale
+	import Marvin.SmartThing.Utils
   
 	@doc "Start an actuator from a configuration"
 	def start_link(actuator_config) do
@@ -57,8 +54,8 @@ defmodule Marvin.SmartThing.Actuator do
 
 	defp check_freshness(name, intent) do
     age = Intent.age(intent)
-    factor = if intent.strong, do: @strong_intent_factor, else: 1
-    if age > @max_intent_age * factor do
+    factor = if intent.strong, do: strong_intent_factor(), else: 1
+    if age > max_intent_age() * factor do
       Logger.warn("STALE #{Intent.strength(intent)} intent #{inspect intent.about} #{age}")
       CNS.notify_overwhelmed(:actuator, name)
       false

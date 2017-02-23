@@ -2,9 +2,9 @@ defmodule Marvin.MockRover.InfraredSensor do
 	@moduledoc "A mock infrared sensor"
 
 	@behaviour Marvin.SmartThing.Sensing
-  @max_beacon_channels 4
 
 	alias Marvin.SmartThing.Device
+	import Marvin.SmartThing.Utils
 
 	def new() do
 		%Device{mod: __MODULE__,
@@ -17,7 +17,7 @@ defmodule Marvin.MockRover.InfraredSensor do
 	### Sensing
 	
 	def senses(_) do
-		beacon_senses = Enum.reduce(1 .. @max_beacon_channels,
+		beacon_senses = Enum.reduce(1 .. max_beacon_channels(),
 																[],
 			fn(channel, acc) ->
 				acc ++

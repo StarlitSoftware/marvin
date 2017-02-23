@@ -4,7 +4,7 @@ defmodule Marvin.Rover.Platform do
 
 	@moduledoc "Module implementing smart thing platform_dispatch calls"
 
-	alias Marvin.Ev3.{Brick, Display, LegoSensor, LegoMotor, LegoSound, LegoLED, InfraredSensor}
+	alias Marvin.Ev3.{Brick, Display, LegoSound, LegoSensor, LegoMotor, LegoLED, InfraredSensor}
 	require Logger
 	
 	### PlatformBehaviour

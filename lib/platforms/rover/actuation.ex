@@ -61,10 +61,14 @@ defmodule Marvin.Rover.Actuation do
                          activations: [
                            %Activation{intent: :say_hungry,
                                        action: say_hungry()},
-                          %Activation{intent: :say_tracking,
+                           %Activation{intent: :say_full,
+                                       action: say_full()},
+                           %Activation{intent: :say_tracking,
                                        action: say_tracking()},
                            %Activation{intent: :say_scared,
                                        action: say_scared()},
+                           %Activation{intent: :say_ok_now,
+                                       action: say_ok_now()},
                            %Activation{intent: :say_curious,
                                        action: say_curious()},
                            %Activation{intent: :say_uh_oh,
@@ -111,11 +115,11 @@ defmodule Marvin.Rover.Actuation do
 
 	defp speed(kind) do
 		case kind do
-			:very_fast -> 3
-			:fast -> 2
-      :normal -> 1
-			:slow -> 0.5
-			:very_slow -> 0.3
+			:very_fast -> very_fast_rps()
+			:fast -> fast_rps()
+      :normal -> normal_rps()
+			:slow -> slow_rps()
+			:very_slow -> very_slow_rps()
 		end
 	end
 
@@ -218,6 +222,13 @@ defmodule Marvin.Rover.Actuation do
     end
   end
   
+  defp say_full() do
+    fn(_intent, sound_players) ->
+      Script.new(:say_full, sound_players)
+      |> Script.add_step(:loud_speech, :speak, ["I am full"])
+    end
+  end
+  
   defp say_tracking() do
     fn(_intent, sound_players) ->
       Script.new(:say_tracking, sound_players)
@@ -229,6 +240,13 @@ defmodule Marvin.Rover.Actuation do
     fn(_intent, sound_players) ->
       Script.new(:say_scared, sound_players)
       |> Script.add_step(:loud_speech, :speak, ["I am scared"])
+    end
+  end
+  
+  defp say_ok_now() do
+    fn(_intent, sound_players) ->
+      Script.new(:say_ok_now, sound_players)
+      |> Script.add_step(:loud_speech, :speak, ["I am ok now"])
     end
   end
   
