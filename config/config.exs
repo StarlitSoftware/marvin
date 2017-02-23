@@ -33,7 +33,7 @@ use Mix.Config
 
 # Configures the endpoint
 config :marvin,
-platforms: %{"mock_rover" => Marvin.RoverMock.Platform,
+platforms: %{"mock_rover" => Marvin.MockRover.Platform,
 						 "rover" => Marvin.Rover.Platform,
 						 "hub" => Marvin.Hub.Platform},
 profiles: %{"puppy" => Marvin.Puppy.Profile,
@@ -50,13 +50,12 @@ pubsub: [name: Hub.PubSub,
          adapter: Phoenix.PubSub.PG2]
 
 	# Configures Elixir's Logger
-config :logger,
-level: :info
-# backends:  [{LoggerFileBackend, :log}] # TODO
+# config :logger, :log
+# backends: [{LoggerFileBackend, :log}] 
 
-config :logger, :log,
+config :logger, :console,
 level: :info,
-path: (if (System.get_env("MARVIN_PLATFORM") || "mock_rover") == "rover", do: "/mnt/rover.log", else: "rover.log"),
+#path: (if (System.get_env("MARVIN_SYSTEM") || "pc") == "ev3", do: "/mnt/rover.log", else: "rover.log"),
 format: "$time $metadata[$level] $message\n",
 metadata: [:request_id]
 

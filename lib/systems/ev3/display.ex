@@ -1,13 +1,16 @@
 defmodule Marvin.Ev3.Display do
-	# Authored by Frank Hunleth
+	# Modified from code by Frank Hunleth
 	
   use GenServer
   alias ExNcurses, as: N
+	alias Marvin.Ev3.Brick
+	require Logger
 
-	@refresh_interval 5000 # Every 2 seconds
+	@refresh_interval 2000 # Every 2 seconds
+	@name __MODULE__
 
-  def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, [], opts)
+  def start_link() do
+    GenServer.start_link(@name, [], [name: @name])
   end
 
   def init(_) do
@@ -15,29 +18,31 @@ defmodule Marvin.Ev3.Display do
     N.clear()
     N.refresh()
     :timer.send_interval(@refresh_interval, :refresh)
-    {:ok, 0}
+    {:ok, "Started"}
   end
 
   def terminate(_reason, _state) do
     N.endwin()
   end
 
+	def show_banner(banner) do
+		GenServer.cast(@name, {:banner, banner})
+	end
+
+	def handle_cast({:banner, banner}, _state) do
+		Logger.info("Banner: #{banner}")
+		{:noreply, banner}
+	end
+
   def handle_info(:refresh, state) do
-    N.mvprintw(2, 1, "Hello #{state}")
-
-    N.mvprintw(3, 1, "IP: #{ipaddr()}")
-    N.mvprintw(4, 1, "Node: #{node()}")
-    N.mvprintw(5, 1, "Battery: #{battery_voltage()}V")
-    N.mvprintw(6, 1, "Memory: #{meminfo()}")
+    N.clear()
+    N.mvprintw(2, 1, "#{inspect state}")
+    N.mvprintw(5, 1, "IP: #{Brick.ipaddr()}")
+    N.mvprintw(7, 1, "Node: #{node()}")
+    N.mvprintw(9, 1, "Battery: #{battery_voltage()}V")
+    N.mvprintw(11, 1, "Memory: #{meminfo()}")
     N.refresh()
-    {:noreply, state + 1}
-  end
-
-  defp ipaddr() do
-    case Nerves.NetworkInterface.settings("wlan0") do
-      {:ok, settings} -> settings.ipv4_address
-      _ -> "Unknown"
-    end
+    {:noreply, state}
   end
 
   defp battery_voltage() do

@@ -4,7 +4,7 @@ defmodule Marvin.Rover.Platform do
 
 	@moduledoc "Module implementing smart thing platform_dispatch calls"
 
-	alias Marvin.Ev3.{Brick, LegoSensor, LegoMotor, LegoSound, LegoLED, InfraredSensor}
+	alias Marvin.Ev3.{Brick, Display, LegoSensor, LegoMotor, LegoSound, LegoLED, InfraredSensor}
 	require Logger
 	
 	### PlatformBehaviour
@@ -12,6 +12,14 @@ defmodule Marvin.Rover.Platform do
 	def start() do
 		Logger.info("Starting ev3 system")
 		Brick.start()
+	end
+
+	def ready?() do
+		Brick.ready?()
+	end
+
+	def display(words) do
+		Display.show_banner(words)
 	end
 
 	def actuation_logic() do

@@ -41,10 +41,10 @@ defmodule Marvin.Ev3.Sysfs do
 	 write_sys(device.path, "command", command)
  end
  
- @doc "Execute a stop command on a device"
- def execute_stop_command(device, command) do
-	 true = command in device.props.stop_commands
-	 write_sys(device.path, "stop_command", command)
+ @doc "Execute a stop action on a device"
+ def execute_stop_action(device, command) do
+	 true = command in device.props.stop_actions
+	 write_sys(device.path, "stop_action", command)
  end
  
 end

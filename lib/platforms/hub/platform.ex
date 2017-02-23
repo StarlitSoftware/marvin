@@ -12,6 +12,14 @@ defmodule Marvin.Hub.Platform do
 		Logger.info("Platform hub started")
 	end
 
+	def ready?() do
+		true
+	end
+
+	def display(words) do
+		Logger.info("DISPLAYING: #{words}")
+	end
+
 	def actuation_logic() do
 		Marvin.Hub.Actuation.actuator_configs()
 	end

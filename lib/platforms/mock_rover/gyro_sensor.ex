@@ -1,4 +1,4 @@
-defmodule Marvin.RoverMock.GyroSensor do
+defmodule Marvin.MockRover.GyroSensor do
   @moduledoc "A mock gyro sensor"
 
   @behaviour Marvin.SmartThing.Sensing

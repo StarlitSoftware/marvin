@@ -100,6 +100,10 @@ defmodule Marvin.SmartThing.Percept do
 		end
 	end
 
+	def transient?(percept) do
+		percept.transient
+	end
+
 	### PRIVATE
 
 	defp same_source?(source1, source2) when is_map(source1) and is_map(source2) do

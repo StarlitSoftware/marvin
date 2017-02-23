@@ -12,17 +12,20 @@
 -noinput +Bd
 
 # CHANGE IT
--env MARVIN_NERVES yes
-#-env MARVIN_HOST 192.168.1.120
--env MARVIN_HOST 192.168.1.121
+# I am rodney
+-env MARVIN_PEER marvin@nerves-2091
+#-env MARVIN_PEER rodney@nerves-5e58
+#-env MARVIN_HOST 192.168.1.123
+-env MARVIN_HOST 192.168.1.122
 #-env MARVIN_PORT 4001
 -env MARVIN_PORT 4002
+#-env MARVIN_PLATFORM mock_rover
 -env MARVIN_PLATFORM rover
-#-env MARVIN_PLATFORM rover_mock
 -env MARVIN_PROFILE puppy
 -env MARVIN_COMMUNITY brood
-#-env MARVIN_PEER rodney@nerves-5e58
--env MARVIN_PEER marvin@nerves-2091
 -env MARVIN_PARENT_URL localhost:4003
+
+-env MARVIN_SYSTEM ev3
+# -env MARVIN_SYSTEM pc
 
 -extra --no-halt

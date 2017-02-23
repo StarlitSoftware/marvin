@@ -1,10 +1,10 @@
 defmodule Marvin.Ev3.Brick do
 
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
-  # for more information on OTP Applications
+	require Logger
+
   def start() do
     import Supervisor.Spec
-
+		Logger.info("Starting EV3 system")
     # Initialize
     load_ev3_modules()
     start_writable_fs()
@@ -21,6 +21,19 @@ defmodule Marvin.Ev3.Brick do
     Supervisor.start_link(children, opts)
   end
 
+	def ready?() do
+		ipaddr() != "Unknown"
+	end
+
+  def ipaddr() do
+    case Nerves.NetworkInterface.settings("wlan0") do
+      {:ok, settings} -> settings.ipv4_address
+      _ -> "Unknown"
+    end
+  end
+ 
+	### PRIVATE
+	
   defp load_ev3_modules() do
 		wifi_driver = Application.get_env(:marvin, :wifi_driver)
     System.cmd("modprobe", [wifi_driver])
@@ -37,7 +50,7 @@ defmodule Marvin.Ev3.Brick do
   end
 
   defp start_wifi() do
-    opts = Application.get_env(:nerves, :wlan0)
+    opts = Application.get_env(:marvin, :wlan0)
     Nerves.InterimWiFi.setup "wlan0", opts
   end
 

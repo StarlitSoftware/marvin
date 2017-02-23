@@ -52,26 +52,31 @@ defmodule Marvin.SmartThing.SmartThingSupervisor do
 	### Private
 
 	defp start_detectors() do
+		Logger.info("Starting detectors")
 		sensing_devices = SmartThing.sensors() ++ SmartThing.motors()
 		Enum.each(sensing_devices, &(DetectorsSupervisor.start_detector(&1)))		
 	end
 	
 	defp start_perceptors() do
+		Logger.info("Starting perceptors")
 		SmartThing.perception_logic()
 		|> Enum.each(&(PerceptorsSupervisor.start_perceptor(&1)))
 	end
 
   defp start_motivators() do
+		Logger.info("Starting motivators")
 		SmartThing.motivation_logic()
 		|> Enum.each(&(MotivatorsSupervisor.start_motivator(&1)))
 	end
 
   defp start_behaviors() do
+		Logger.info("Starting behaviors")
 		SmartThing.behavior_logic()
 		|> Enum.each(&(BehaviorsSupervisor.start_behavior(&1)))
 	end
 
   defp start_actuators() do
+		Logger.info("Starting actuators")
 		SmartThing.actuation_logic() # dispatches to platform
 		|> Enum.each(&(ActuatorsSupervisor.start_actuator(&1)))
 	end

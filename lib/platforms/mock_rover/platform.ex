@@ -1,10 +1,10 @@
-defmodule Marvin.RoverMock.Platform do
+defmodule Marvin.MockRover.Platform do
 
 	@moduledoc "The mock ROVER platform"
 
 	@behaviour Marvin.SmartThing.PlatformBehaviour
 
-	alias Marvin.RoverMock.{TouchSensor,
+	alias Marvin.MockRover.{TouchSensor,
 												ColorSensor,
 												InfraredSensor,
 												UltrasonicSensor,
@@ -18,8 +18,27 @@ defmodule Marvin.RoverMock.Platform do
 	### PlatformBehaviour
 
 	def start() do
-		Logger.info("Platform rover_mock started")
+		Logger.info("Platform mock_rover started")
+		if System.get_env("MARVIN_SYSTEM") == "ev3" do
+			Marvin.Ev3.Brick.start()
+		end
 	end
+
+	def ready?() do
+		if System.get_env("MARVIN_SYSTEM") == "ev3" do
+			Marvin.Ev3.Brick.ready?()
+		else
+			true
+		end
+  end		
+
+	def display(words) do
+		if System.get_env("MARVIN_SYSTEM") == "ev3" do
+			Marvin.Ev3.Display.show_banner(words)
+		else
+			Logger.info("DISPLAYING: #{words}")
+		end
+  end		
 
 	def actuation_logic() do
 		Marvin.Rover.Actuation.actuator_configs() # Use Rover's actuation

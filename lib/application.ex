@@ -4,32 +4,30 @@ defmodule Marvin.Application do
   use Application
   require Logger
 	alias Marvin.SmartThing.{SmartThingSupervisor, CNS, InternalClock}
+	alias Marvin.SmartThing
   import Supervisor.Spec, warn: false
 
   @poll_runtime_delay 5000
-
+	@max_waits 20
+	
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
 		Logger.info("Starting #{__MODULE__}")
-		 Marvin.SmartThing.start_platform()
-	  connect_to_nodes()
+		Marvin.SmartThing.start_platform()
     children = [
-			supervisor(Marvin.Endpoint, []),
-			supervisor(SmartThingSupervisor, [])
+			# supervisor(Marvin.Endpoint, []),
+			# supervisor(SmartThingSupervisor, [])
     ]
     opts = [strategy: :one_for_one, name: :root_supervisor]
     result = Supervisor.start_link(children, opts)
-		SmartThingSupervisor.start_execution()
-		SmartThingSupervisor.start_perception()
-    Process.spawn(fn -> push_runtime_stats() end, [])
-		InternalClock.resume()
-		 result
+	#	spawn_link(fn() -> go_when_platform_ready() end)
+		result
   end
 
   @doc "Return ERTS runtime stats"
   def runtime_stats() do  # In camelCase for Elm's automatic translation
-    stats = mem_stats()
+    stats = mem_stats(SmartThing.system())
     %{ramFree: stats.mem_free,
       ramUsed:  stats.mem_used,
       swapFree: stats.swap_free,
@@ -48,14 +46,55 @@ defmodule Marvin.Application do
 		CNS.notify_shutdown()
 	end
 
+	def toggle_paused() do
+		CNS.toggle_paused()
+	end
+
+	def go() do
+	  connect_to_nodes()
+		SmartThingSupervisor.start_execution()
+		SmartThingSupervisor.start_perception()
+    Process.spawn(fn -> push_runtime_stats() end, [])
+		InternalClock.resume()
+	end
+
   ### Private
+
+	defp go_when_platform_ready() do
+		wait_for_platform_ready(0)
+		go()
+	end
+
+	defp wait_for_platform_ready(n) do
+		if SmartThing.platform_ready?() do
+			:ok
+		else
+			if n >= @max_waits do
+				{:error, :platform_not_ready}
+			else
+				Process.sleep(1_000)
+				wait_for_platform_ready(n + 1)
+			end
+		end
+	end
 
 	defp connect_to_nodes() do
 		Node.connect(Marvin.SmartThing.peer()) # join the peer network
 		Logger.info("#{Node.self()} is connected to #{inspect Node.list()}")
 	end
 
-  defp mem_stats() do
+  defp mem_stats("ev3") do
+    {res, 0} = System.cmd("free", ["-m"])
+    [_labels, mem, _buffers, swap | _] = String.split(res, "\n")
+    [_, _mem_total, mem_used, mem_free, _, _, _] = String.split(mem) 
+	  [_, _swap_total, swap_used, swap_free] = String.split(swap)
+    %{mem_free: to_int!(mem_free),
+      mem_used: to_int!(mem_used),
+      swap_free: to_int!(swap_free),
+      swap_used: to_int!(swap_used)}
+  end
+
+  defp mem_stats("pc") do
     {res, 0} = System.cmd("free", ["-m"])
     [_labels, mem, swap, _buffers] = String.split(res, "\n")
     [_, _mem_total, mem_used, mem_free, _, _, _] = String.split(mem) 

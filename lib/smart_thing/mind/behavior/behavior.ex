@@ -4,7 +4,7 @@ defmodule Marvin.SmartThing.Behavior do
 	alias Marvin.SmartThing.{Memory, Percept, Motive, Transition, FSM, BehaviorConfig, CNS}
 	require Logger
 
-	@max_percept_age 1000 # 1000 # percepts older than 1 sec are stale
+	@max_percept_age 2000 # 2000 # percepts older than 2 secs are stale
 	@max_motive_age 3000 # 3000 # motives older than 3 secs are stale
 
 	@doc "Start a behavior from a configuration"
@@ -195,8 +195,10 @@ defmodule Marvin.SmartThing.Behavior do
   defp check_freshness(name, %Percept{} = percept) do
     age = Percept.age(percept)
     if age > @max_percept_age do
-      Logger.info("STALE percept #{inspect percept.about} #{age}")
-      CNS.notify_overwhelmed(:behavior, name)
+			if not Percept.transient?(percept) do
+				Logger.info("STALE percept #{inspect percept.about} #{age}")
+				CNS.notify_overwhelmed(:behavior, name)
+			end
       false
     else
       true

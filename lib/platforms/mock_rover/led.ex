@@ -1,4 +1,4 @@
-defmodule Marvin.RoverMock.LED do
+defmodule Marvin.MockRover.LED do
 	@moduledoc "A mock led"
 
 	alias Marvin.SmartThing.Device

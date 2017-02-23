@@ -3,6 +3,12 @@ defmodule Marvin.SmartThing.PlatformBehaviour do
 	@doc "Starts the platform"
 	@callback start() :: :ok | {:error, binary}
 
+	@doc "Is the platform fully started?"
+	@callback ready?() :: boolean
+
+	@doc "Somehow display some words"
+	@callback display(words :: binary) :: any
+
 	@doc "Translates a generic device type to the platform's device type"
 	@callback mode(device_type :: atom) :: binary
 

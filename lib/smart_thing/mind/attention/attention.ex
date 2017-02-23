@@ -3,7 +3,7 @@ defmodule Marvin.SmartThing.Attention do
 	@moduledoc "Responsible for attention. On each clock tick, polls only the sensors that senses what matters here and now, unless already in the midst of a polling run."
 
 	require Logger
-	alias Marvin.SmartThing.{Device, Detector, Communicators, Memory}
+	alias Marvin.SmartThing.{CNS, Communicators, Memory}
 	alias Marvin.SmartThing
 
 	@name __MODULE__
@@ -51,7 +51,7 @@ defmodule Marvin.SmartThing.Attention do
 		else
 			Logger.info("TICK: polling")
 			attended_senses = find_attended_senses(state)
-			spawn_link(fn() -> detect(attended_senses, state) end)
+			detect(attended_senses, state)
 		  {:noreply, %{state | polling: true, attended_senses: attended_senses}}
 		end
 		
@@ -70,14 +70,16 @@ defmodule Marvin.SmartThing.Attention do
 	defp detect(attended_senses, %{sensing_devices: sensing_devices} = _state) do
 		Enum.each(sensing_devices,
 			fn(sensing_device) ->
-				device_senses = apply(sensing_device.mod, :senses, [sensing_device])
-				Enum.each(device_senses,
-					fn(device_sense) ->
-						if device_sense in attended_senses do
-							Logger.info("POLLING #{inspect device_sense} of #{inspect sensing_device.type}")
-							Detector.poll(Device.name(sensing_device), device_sense)
-						end
-					end)
+				spawn_link(fn() -> # Poll each device concurrently
+					device_senses = apply(sensing_device.mod, :senses, [sensing_device])
+					Enum.each(device_senses,
+						fn(device_sense) ->
+							if device_sense in attended_senses do
+								Logger.info("POLLING #{inspect device_sense} of #{inspect sensing_device.type}")
+								CNS.notify_poll(sensing_device, device_sense)
+							end
+						end)
+				end)
 			end)
 		send(@name, :polling_completed) # "out of band" message to set polling state to false
 	end

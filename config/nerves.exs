@@ -11,7 +11,7 @@ config :nerves_interim_wifi,
 regulatory_domain: "US"
 
 config :marvin, # TODO put under :marvin, :ev3
- wifi_driver: "r8188eu"
+ wifi_driver: "mt7601u"
 
 # Change these options to your  # TODO put under :marvin, :ev3
 config :marvin, :wlan0,

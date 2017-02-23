@@ -81,7 +81,7 @@ defmodule Marvin.Ev3.Tachomotor do
 	@doc "Coast a motor to a halt according to controls"
   def coast(motor) do
 		apply_motor_controls(motor)
-		execute_stop_command(motor, "coast")
+		execute_stop_action(motor, "coast")
 		# Patches running flag not removed by stopping
 		reset(motor)		
     apply_motor_controls(motor)
@@ -91,7 +91,7 @@ defmodule Marvin.Ev3.Tachomotor do
 	@doc "Brake a motor to a sudden halt according to controls"
   def brake(motor) do
 		apply_motor_controls(motor)
-		execute_stop_command(motor, "brake")
+		execute_stop_action(motor, "brake")
 		# Patches running flag not removed by stopping
 		reset(motor)
     apply_motor_controls(motor)
@@ -101,7 +101,7 @@ defmodule Marvin.Ev3.Tachomotor do
 	@doc "Actively hold a motor to its current position according to controls"
   def hold(motor) do
 		apply_motor_controls(motor)
-		execute_stop_command(motor, "hold")
+		execute_stop_action(motor, "hold")
 		motor
   end
 

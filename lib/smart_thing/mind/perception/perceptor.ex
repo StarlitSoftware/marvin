@@ -59,9 +59,11 @@ defmodule Marvin.SmartThing.Perceptor do
 
    defp check_freshness(name, percept) do
     age = Percept.age(percept)
-    if age > @max_percept_age do
-      Logger.warn("STALE percept #{inspect percept.about} #{age}")
-      CNS.notify_overwhelmed(:perceptor, name)
+     if age > @max_percept_age do
+			 if not Percept.transient?(percept) do
+				 Logger.warn("STALE percept #{inspect percept.about} #{age}")
+				 CNS.notify_overwhelmed(:perceptor, name)
+			 end
       false
     else
       true

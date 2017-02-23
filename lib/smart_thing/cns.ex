@@ -2,7 +2,7 @@ defmodule Marvin.SmartThing.CNS do
 	@moduledoc "A resilient event manager that acts as the smart thing's central nervous system"
 
   alias Marvin.SmartThing.{PerceptorsHandler, AttentionHandler, MemoryHandler,InternalClockHandler,
-													 ActuatorsHandler, BehaviorsHandler, MotivatorsHandler,
+													 ActuatorsHandler, BehaviorsHandler, MotivatorsHandler, DetectorsHandler,
 													 Percept, Motive, Intent}
 	require Logger
 	use GenServer
@@ -118,6 +118,10 @@ defmodule Marvin.SmartThing.CNS do
     GenServer.cast(@name, {:notify_runtime_stats, stats})
   end
 
+	def notify_poll(sensing_device, sense) do
+		GenServer.cast(@name, {:poll, sensing_device, sense})
+	end
+
 	### Callbacks
 
 	def init(_) do
@@ -215,6 +219,11 @@ defmodule Marvin.SmartThing.CNS do
 		{:noreply, state}
 	end
 
+	def handle_cast( {:poll, sensing_device, sense}, state) do
+		GenEvent.notify(@dispatcher, {:poll, sensing_device, sense})
+		{:noreply, state}
+	end
+
 	def handle_info({:gen_event_EXIT, crashed_handler, error}, state) do
 		Logger.error("#{crashed_handler} crashed. Restarting #{__MODULE__}.")		
 		{:stop, {:handler_died, error}, state}
@@ -271,6 +280,7 @@ defmodule Marvin.SmartThing.CNS do
 		:ok = GenEvent.add_mon_handler(@dispatcher, BehaviorsHandler, [])
 		:ok = GenEvent.add_mon_handler(@dispatcher, MotivatorsHandler, [])
 		:ok = GenEvent.add_mon_handler(@dispatcher, PerceptorsHandler, [])
+		:ok = GenEvent.add_mon_handler(@dispatcher, DetectorsHandler, [])
 #		:ok = GenEvent.add_mon_handler(@dispatcher, ChannelsHandler, [])
 	end
 

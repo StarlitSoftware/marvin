@@ -1,10 +1,11 @@
 defmodule Marvin.SmartThing do
 
+	require Logger
 	alias Marvin.SmartThing.Communicators
 	import Marvin.SmartThing.Utils, only: [platform_dispatch: 1, platform_dispatch: 2, profile_dispatch: 1]
 	
 	def platform() do
-		platform_name = System.get_env("MARVIN_PLATFORM") || "mock_ev3"
+		platform_name = System.get_env("MARVIN_PLATFORM") || "mock_rover"
 		platforms = Application.get_env(:marvin, :platforms)
     Map.get(platforms, platform_name)
 	end
@@ -15,8 +16,20 @@ defmodule Marvin.SmartThing do
     Map.get(profiles, profile_name)
 	end
 
+	def system() do
+		System.get_env("MARVIN_SYSTEM") || "pc"
+	end
+
 	def start_platform() do
 		platform_dispatch(:start)
+	end
+
+	def platform_ready?() do
+		platform_dispatch(:ready?)
+	end
+
+	def display(words) do
+		platform_dispatch(:display, [words])
 	end
 
 	def community_name() do

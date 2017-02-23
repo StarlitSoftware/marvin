@@ -36,19 +36,20 @@ defmodule Marvin.Mommy.Behaviors do
 		]
 	end
 
-	def start_parenting() do
-		fn(_percept, _state) ->
-			Logger.info("STARTING PARENTING")
-			generate_intent(:say_parenting)
-		end
-	end
-
 	def calm_down_brood() do
-		fn(%Percept{about: :out_of_control_panicking, value: %{member_name: member_name, member_url: url}}, _state) ->
+		fn(%Percept{about: :out_of_control_panicking,
+								 value: %{member_name: member_name, member_url: url}}, _state) ->
 			Logger.info("COMMAND TO CALM DOWN")
 			generate_intent(:say_calm_down, %{member_name: member_name})
 			generate_intent(:command, %{command: :calm_down,
 																	to_url:  url})
+		end
+	end
+
+	def start_parenting() do
+		fn(_percept, _state) ->
+			Logger.info("STARTING PARENTING")
+			generate_intent(:say_parenting)
 		end
 	end
 

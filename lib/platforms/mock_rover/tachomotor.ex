@@ -1,4 +1,4 @@
-defmodule Marvin.RoverMock.Tachomotor do
+defmodule Marvin.MockRover.Tachomotor do
 	@moduledoc "A mock large tachomotor"
 
 	@behaviour Marvin.SmartThing.Sensing

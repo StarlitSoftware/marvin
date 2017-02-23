@@ -1,4 +1,4 @@
-defmodule Marvin.RoverMock.InfraredSensor do
+defmodule Marvin.MockRover.InfraredSensor do
 	@moduledoc "A mock infrared sensor"
 
 	@behaviour Marvin.SmartThing.Sensing

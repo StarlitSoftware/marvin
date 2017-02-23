@@ -1,4 +1,4 @@
-defmodule Marvin.RoverMock.TouchSensor do
+defmodule Marvin.MockRover.TouchSensor do
 	@moduledoc "A mock touch sensor"
 
 	@behaviour Marvin.SmartThing.Sensing
