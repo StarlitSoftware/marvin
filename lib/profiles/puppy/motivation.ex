@@ -53,7 +53,7 @@ defmodule Marvin.Puppy.Motivation do
 	def curiosity() do
 		fn
 		(%Percept{about: :time_elapsed}, _) ->
-				Motive.on(:curiosity) # never turned off
+				Motive.on(:curiosity) # never turned off, only inhibited
 		end
 	end
 	
@@ -110,7 +110,9 @@ defmodule Marvin.Puppy.Motivation do
             :hunger,
             fn(value) -> value == :on end) do
 				Logger.warn("GREED toward #{id_channel} IS ON")
-        Motive.on(:greed, %{id_channel: id_channel}) |> Motive.inhibit(:hunger)
+        Motive.on(:greed, %{id_channel: id_channel})
+				|> Motive.inhibit(:hunger)
+				|> Motive.inhibit(:curiosity)
 	    else
         nil
       end

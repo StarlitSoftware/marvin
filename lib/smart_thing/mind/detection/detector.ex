@@ -3,7 +3,7 @@ defmodule Marvin.SmartThing.Detector do
 
 	require Logger
   alias Marvin.SmartThing.{Percept, CNS, Device}
-	import Marvin.SmartThing.Utils, only: [platform_dispatch: 2]
+	import Marvin.SmartThing.Utils, only: [platform_dispatch: 2, timeout: 0]
 
 	@ttl 10_000 # detected percept is retained for 10 secs # TODO set in config
 
@@ -39,7 +39,9 @@ defmodule Marvin.SmartThing.Detector do
 				else
 					{:ok, %{state | device: updated_device}}
 				end
-			end)
+			end,
+			timeout()
+		)
 		:ok
 	end
 

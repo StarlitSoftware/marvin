@@ -15,13 +15,14 @@ defmodule Marvin.Application do
   def start(_type, _args) do
 		Logger.info("Starting #{__MODULE__}")
 		Marvin.SmartThing.start_platform()
+		wait_for_platform_ready(0)
     children = [
 			supervisor(Marvin.Endpoint, []),
 			supervisor(SmartThingSupervisor, [])
     ]
     opts = [strategy: :one_for_one, name: :root_supervisor]
     result = Supervisor.start_link(children, opts)
-		spawn_link(fn() -> go_when_platform_ready() end)
+		go()
 		result
   end
 
@@ -51,7 +52,7 @@ defmodule Marvin.Application do
 	end
 
 	def go() do
-	  connect_to_nodes()
+	  spawn_link(fn() -> connect_to_nodes() end)
 		SmartThingSupervisor.start_execution()
 		SmartThingSupervisor.start_perception()
     Process.spawn(fn -> push_runtime_stats() end, [])
@@ -60,18 +61,17 @@ defmodule Marvin.Application do
 
   ### Private
 
-	defp go_when_platform_ready() do
-		wait_for_platform_ready(0)
-		go()
-	end
 
 	defp wait_for_platform_ready(n) do
 		if SmartThing.platform_ready?() do
+			Process.sleep(1000) # TODO - necessary?
+			Logger.info("Platform ready!")
 			:ok
 		else
 			if n >= @max_waits do
 				{:error, :platform_not_ready}
 			else
+				Logger.info("Platform not ready")
 				Process.sleep(1_000)
 				wait_for_platform_ready(n + 1)
 			end
@@ -79,8 +79,13 @@ defmodule Marvin.Application do
 	end
 
 	defp connect_to_nodes() do
-		Node.connect(Marvin.SmartThing.peer()) # join the peer network
-		Logger.info("#{Node.self()} is connected to #{inspect Node.list()}")
+		Node.connect(Marvin.SmartThing.peer()) # try to join the peer network
+		if Node.list() == [] do
+			Process.sleep(1_000)
+			connect_to_nodes() # try again
+		else
+			Logger.info("#{Node.self()} is connected to #{inspect Node.list()}")
+		end
 	end
 
   defp mem_stats("ev3") do

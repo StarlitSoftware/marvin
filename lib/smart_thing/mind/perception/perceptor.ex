@@ -45,7 +45,9 @@ defmodule Marvin.SmartThing.Perceptor do
 	### Private
 
 	defp analysis(name, percept, %{perceptor_config: config, responsive: responsive}) do
-		if responsive and (Percept.sense(percept) in config.focus.senses) and check_freshness(name, percept) do
+		if responsive
+		and (Percept.sense(percept) in config.focus.senses)
+		and check_freshness(name, percept) do
 			memories = Memory.since(config.span,
                               senses: config.focus.senses,
                               motives: config.focus.motives,

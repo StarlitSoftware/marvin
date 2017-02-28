@@ -49,7 +49,6 @@ defmodule Marvin.SmartThing.Attention do
 			Logger.warn("TICK: already polling")
 			{:noreply, state}
 		else
-			Logger.info("TICK: polling")
 			attended_senses = find_attended_senses(state)
 			detect(attended_senses, state)
 		  {:noreply, %{state | polling: true, attended_senses: attended_senses}}
@@ -104,15 +103,11 @@ defmodule Marvin.SmartThing.Attention do
 															attended_senses: attended_senses,
 															detected_senses: detected_senses} = _state) do
 	  if attended_senses != nil do
-			Logger.debug("CACHED attended senses => #{inspect attended_senses}")
 			attended_senses
 		else
 			on_motives = Memory.on_motives()
-			Logger.info("On motives = #{inspect(Enum.map(on_motives, &(&1.about)))}")
 			attended_motive_senses = attended_motive_senses(on_motives, motivator_configs)
-			Logger.info("Motive senses = #{inspect attended_motive_senses}")
 			attended_behavior_senses =	attended_behavior_senses(on_motives, behavior_configs)
-			Logger.info("Behavior senses = #{inspect attended_behavior_senses}")
 			senses = Enum.reduce(attended_motive_senses ++ attended_behavior_senses,
 																				[],
 				fn(top_sense, acc) ->
@@ -130,7 +125,7 @@ defmodule Marvin.SmartThing.Attention do
 						acc
 					end
 				end)
-			Logger.info("ATTENDED senses => #{inspect all_attended_senses}")
+			Logger.info("DETECTED senses => #{inspect all_attended_senses}")
 			all_attended_senses
 		end
 	end
@@ -152,7 +147,6 @@ defmodule Marvin.SmartThing.Attention do
 			fn(motive_name) ->
 				Enum.any?(on_motives, &(motive_name in &1.inhibits))
 			end)
-		Logger.debug("UNINHIBITED MOTIVES => #{inspect uninhibited_motive_names}")
 		Enum.reduce(uninhibited_motive_names,
 								[],
 			fn(motive_name, acc) ->
@@ -177,7 +171,6 @@ defmodule Marvin.SmartThing.Attention do
 			fn(behavior_name) ->
 				Enum.any?(inhibited_motive_names, &(behavior_motivated_by?(behavior_name, &1, behavior_configs)))
 			end)
-		Logger.info("Active behavior names #{inspect active_behavior_names}")
 		Enum.reduce(reflex_behavior_names ++ active_behavior_names,
 								[],
 			fn(behavior_name, acc) ->

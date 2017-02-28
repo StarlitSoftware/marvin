@@ -37,10 +37,11 @@ defmodule Marvin.Ev3.Display do
   def handle_info(:refresh, state) do
     N.clear()
     N.mvprintw(2, 1, "#{inspect state}")
-    N.mvprintw(5, 1, "IP: #{Brick.ipaddr()}")
-    N.mvprintw(7, 1, "Node: #{node()}")
-    N.mvprintw(9, 1, "Battery: #{battery_voltage()}V")
-    N.mvprintw(11, 1, "Memory: #{meminfo()}")
+    N.mvprintw(4, 1, "IP: #{Brick.ipaddr()}")
+    N.mvprintw(6, 1, "Node: #{node()}")
+		N.mvprintw(8, 1, "Peers: #{inspect Node.list()}")
+    N.mvprintw(10, 1, "Battery: #{battery_voltage()}V")
+    N.mvprintw(12, 1, "Memory: #{meminfo()}")
     N.refresh()
     {:noreply, state}
   end

@@ -30,33 +30,25 @@ defmodule Marvin.Mommy.Perception do
 	def out_of_control_panicking() do
 		fn
 			(%Percept{about: :report,
-								value: %{is: %{feeling: :panic},
-												 from: %{community_name: community,
-																 member_url: member_url,
-																 member_name: member_name}}
+								value: %{is: %{feeling: :panic}},
 							 },
 				%{percepts: percepts}) ->
-				how_many_panics = summation(
+				recent_panics = select_memories(
 				percepts,
-				:report,
-				30_000,
-				fn(value) ->
-					case value do
-						%{is: %{feeling: :panic},
-							from: %{community_name: a_community,
-										  member_url: a_member_url}} when community == a_community and member_url == a_member_url -> 1
-						_ ->
-							0
-					end
-				end,
-				0
-			) # How many brood panics in the last 30 secs?
-			cond do
-				how_many_panics > 2 ->
-					Percept.new(about: :out_of_control_panicking, value: %{member_name: member_name, member_url: member_url})
-				true ->
-					nil
-			end
+				about: :report,
+				since: 10_000,
+				test: fn(%{is: reported}) -> Map.equal?(reported, %{feeling: :panic}) end)
+		if Enum.count(recent_panics) > 1 do
+			uniques = Enum.uniq_by(recent_panics, fn(%Percept{value: %{from: from}}) -> from end)
+			Enum.map(uniques,
+				fn(%Percept{value: %{from: from}}) ->
+					Percept.new(about:
+											:out_of_control_panicking,
+											value: %{member_name: from.member_name, member_url: from.member_url})
+				end)
+		else
+			nil
+		end
 			(_, _) ->
 				nil
 		end
@@ -73,7 +65,7 @@ defmodule Marvin.Mommy.Perception do
 				%{percepts: percepts}) when channel != 0 ->
 				hoggings = select_memories(percepts,
 																	 about: :report,
-																	 since: 60_000,
+																	 since: 30_000,
 				test: fn(value) ->
 					case value do
 						%{is: %{doing: :eating},
@@ -85,7 +77,7 @@ defmodule Marvin.Mommy.Perception do
 							false
 					end
 				end)
-			if Enum.count(hoggings) > 1 do
+			if Enum.count(hoggings) != 0 do
 				[%Percept{value: %{from: %{member_url: hogger_url, member_name: hogger_name}}} | _ ] = hoggings
 				Percept.new(about: :food_hogging,
 										value: %{member_url: hogger_url,

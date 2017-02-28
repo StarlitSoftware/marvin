@@ -6,18 +6,18 @@ defmodule Marvin.SmartThing.SoundPlayer do
 	require Logger
 
 	def new() do
-	    %Device{mod: __MODULE__,
+	  %Device{mod: __MODULE__,
 						class: :sound,
             path: "speech",
             port: nil,
             type: "speech",
 						mock: true
-						 }
+					 }
 	end
 
 	@doc "Execute a sound command"
   def execute_command(sound_player, command, params) do
-    spawn(fn -> apply(__MODULE__, command, [sound_player | params]) end)
+		spawn(fn -> apply(__MODULE__, command, [sound_player | params]) end)
     sound_player
   end
 
@@ -32,7 +32,7 @@ defmodule Marvin.SmartThing.SoundPlayer do
   def speak(words, volume, speed, v \\ nil) do
 		voice = v || platform_dispatch(:voice)
 		args =  ["-a", "#{volume}", "-s", "#{speed}", "-v", "#{voice}", words]
-		System.cmd("espeak", args)
+		spawn(fn() -> System.cmd("espeak", args) end)
 	end
 
   @doc "Speak words loud and clear"

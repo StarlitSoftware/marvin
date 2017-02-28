@@ -1,5 +1,4 @@
 ## Name of the node
-#-sname marv
 -sname rodney
 
 ## Cookie for distributed erlang
@@ -11,21 +10,15 @@
 # Comment this next line in to suppress the console
 -noinput +Bd
 
-# CHANGE IT
 # I am rodney
 -env MARVIN_PEER marvin@nerves-2091
-#-env MARVIN_PEER rodney@nerves-5e58
-#-env MARVIN_HOST 192.168.1.123
--env MARVIN_HOST 192.168.1.122
-#-env MARVIN_PORT 4001
+-env MARVIN_HOST 192.168.1.115
 -env MARVIN_PORT 4002
-#-env MARVIN_PLATFORM mock_rover
+-env MARVIN_ID_CHANNEL 3
 -env MARVIN_PLATFORM rover
 -env MARVIN_PROFILE puppy
 -env MARVIN_COMMUNITY brood
--env MARVIN_PARENT_URL localhost:4003
-
+-env MARVIN_PARENT_URL mom:4003
 -env MARVIN_SYSTEM ev3
-# -env MARVIN_SYSTEM pc
 
 -extra --no-halt

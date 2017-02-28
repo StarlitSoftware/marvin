@@ -1,0 +1,23 @@
+#! /bin/sh
+
+# I am MARV
+echo "Burning Marv's firmware"
+cd /media/jf/APPDATA
+sudo rm *.log
+cd /home/jf/projects/marvin
+rm rel/vm.args
+cp rel/vm.args.marv rel/vm.args
+export MARVIN_PEER=rodney@nerves-5e58
+export MARVIN_HOST=nerves-2091
+export MARVIN_PORT=4001
+export MARVIN_ID_CHANNEL=2
+export MARVIN_PLATFORM=rover
+export MARVIN_PROFILE=puppy
+export MARVIN_COMMUNITY=brood
+export MARVIN_PARENT_URL=mom:4003
+export MARVIN_SYSTEM=ev3
+mix clean
+mix compile
+mix firmware
+mix firmware.burn
+

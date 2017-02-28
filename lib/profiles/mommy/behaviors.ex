@@ -40,9 +40,9 @@ defmodule Marvin.Mommy.Behaviors do
 		fn(%Percept{about: :out_of_control_panicking,
 								 value: %{member_name: member_name, member_url: url}}, _state) ->
 			Logger.info("COMMAND TO CALM DOWN")
-			generate_intent(:say_calm_down, %{member_name: member_name})
-			generate_intent(:command, %{command: :calm_down,
-																	to_url:  url})
+			generate_strong_intent(:say_calm_down, %{member_name: member_name})
+			generate_strong_intent(:command, %{command: :calm_down,
+																				 to_url:  url})
 		end
 	end
 
@@ -56,8 +56,8 @@ defmodule Marvin.Mommy.Behaviors do
 	def stop_food_hogging() do
 		fn(%Percept{about: :food_hogging, value: %{member_name: member_name, member_url: url}}, _state) ->
 			Logger.info("COMMAND TO STOP EATING")
-			generate_intent(:say_share_food, %{member_name: member_name})
-			generate_intent(:command, %{command: :stop_eating,
+			generate_strong_intent(:say_share_food, %{member_name: member_name})
+			generate_strong_intent(:command, %{command: :stop_eating,
 																	to_url:  url})
 		end
 	end

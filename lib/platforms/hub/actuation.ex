@@ -48,6 +48,7 @@ defmodule Marvin.Hub.Actuation do
 			name = name_from(member_name)
       Script.new(:say_calm_down, sound_players)
       |> Script.add_step(:loud_speech, :speak, ["Calm down little #{name}"])
+			|> Script.add_wait(1200)
     end
   end
 

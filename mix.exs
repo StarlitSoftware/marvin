@@ -6,8 +6,8 @@ defmodule SmartThing.Mixfile do
  def project() do
     [app: :marvin,
      version: "0.1.0",
-     deps_path: "deps/#{@target}",
-     build_path: "_build/#{@target}",
+     deps_path: "deps",
+     build_path: "_build",
      archives: [nerves_bootstrap: "~> 0.2"],
 		 system: @target,
      elixir: "~> 1.4",
@@ -61,7 +61,8 @@ defmodule SmartThing.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps() do
-    [{:phoenix, "~> 1.1.4"},
+    [
+#		 {:phoenix, "~> 1.1.4"},
      {:phoenix_html, "~> 2.4"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.9"},

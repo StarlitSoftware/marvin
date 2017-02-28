@@ -38,17 +38,17 @@ defmodule Marvin.Puppy.Behaviors do
           ]
         }
       ),
-      BehaviorConfig.new( # Reacting to communications from community members
-        name: :confirming_heard,
-        senses: [:heard],
-        fsm: %FSM{
-          transitions: [
-						%Transition{on: :heard,
-												doing: confirming_heard()
-											 }
-          ]
-        }
-      ),
+      # BehaviorConfig.new( # Reacting to communications from community members
+      #   name: :confirming_heard,
+      #   senses: [:heard],
+      #   fsm: %FSM{
+      #     transitions: [
+			# 			%Transition{on: :heard,
+			# 									doing: confirming_heard()
+			# 								 }
+      #     ]
+      #   }
+      # ),
       
       # Motivated behaviors
       
@@ -102,6 +102,14 @@ defmodule Marvin.Puppy.Behaviors do
                            channel == 1 and orientation == :ahead end
 											 },
 						%Transition{from: [:on_scent, :off_scent],
+												on: :scent_strength,
+												to: :off_scent,
+												condition: fn({strength, channel}, _sense_qualifier, _motives) ->
+                           channel == 1 and strength == :unknown
+                         end,
+												doing: random_course()
+											 },
+						%Transition{from: [:on_scent, :off_scent],
 												on: :scent_direction,
 												to: :off_scent,
 												 condition: fn({orientation, _value, _strength, channel}, _sense_qualifier, _motives) ->
@@ -148,8 +156,8 @@ defmodule Marvin.Puppy.Behaviors do
 						%Transition{from: [:started, :on_track],
 												on: :scent_strength,
 												to: :on_track,
-												 condition: fn({_orientation, _value, _former_strength, channel}, _sense_qualifier, motives) ->
-                           case find_motive(motives, :greed) do
+												 condition: fn({_value, channel}, _sense_qualifier, motives) ->
+													 case find_motive(motives, :greed) do
                              nil -> false
                              motive -> Map.get(motive.details, :id_channel) == channel
                            end
@@ -166,6 +174,19 @@ defmodule Marvin.Puppy.Behaviors do
                                and orientation == :ahead
                            end
                          end
+											 },
+						%Transition{from: [:on_track, :off_track],
+												on: :scent_strength,
+												to: :off_track,
+												condition: fn({strength, channel}, _sense_qualifier, motives) ->
+                          case find_motive(motives, :greed) do
+                            nil ->
+															false
+                            motive ->
+															Map.get(motive.details, :id_channel) == channel and strength == :unknown
+                           end
+                         end,
+												doing: random_course()
 											 },
 						%Transition{from: [:on_track, :off_track],
 												on: :scent_direction,
@@ -263,7 +284,7 @@ defmodule Marvin.Puppy.Behaviors do
 			Logger.info("START ROAMING")
       green_lights()
 			generate_intent(:broadcast, %{doing: :roaming})
-			generate_intent(:report, %{doing: :roaming})
+#			generate_intent(:report, %{doing: :roaming})
       generate_intent(:say_curious)
     end
   end
@@ -291,7 +312,8 @@ defmodule Marvin.Puppy.Behaviors do
 										 1 -> :turn_left
 										 2 -> :turn_right
 									 end
-      generate_intent(turn_where, 4)
+			generate_strong_intent(:go_backward, %{speed: :fast, time: 1})
+      generate_strong_intent(turn_where, 4)
 		end
 	end
 
@@ -325,7 +347,7 @@ defmodule Marvin.Puppy.Behaviors do
 		fn(%Percept{about: :scent_strength, value: {value, _channel}} = percept, _state) ->
 			Logger.info("STAYING THE COURSE from #{percept.about} = #{inspect percept.value}")
 			speed = case value do
-								:unknown-> :very_fast
+								:unknown-> :fast
 								:very_weak -> :fast
 								:weak -> :normal
 								:strong -> :slow
@@ -365,13 +387,28 @@ defmodule Marvin.Puppy.Behaviors do
 		end
 	end
 
+	defp random_course() do
+		fn(_percept, _state) ->
+			Logger.info("RANDOM COURSE")
+			dice = :rand.uniform(4)
+			how_much = round(:rand.uniform(5) / 3)
+			{move, qualifier} = case dice do
+														1 -> {:go_backward,  %{speed: :normal, time: how_much}}
+														2 -> {:go_forward,  %{speed: :normal, time: how_much}}
+														3 -> {:turn_left, how_much}
+														4 -> {:turn_right, how_much}
+													end
+			generate_intent(move, qualifier)
+		end
+	end
+
   defp start_foraging() do
 		fn(_percept, _state) ->
       Logger.info("START FORAGING")
       green_lights()
       generate_strong_intent(:say_hungry)
 			generate_strong_intent(:broadcast, %{doing: :foraging})
-			generate_strong_intent(:report, %{doing: :foraging})
+#			generate_strong_intent(:report, %{doing: :foraging})
     end
   end
 
@@ -381,7 +418,7 @@ defmodule Marvin.Puppy.Behaviors do
       green_lights()
       generate_strong_intent(:say_tracking)
 			generate_strong_intent(:broadcast, %{doing: :tracking})
-			generate_strong_intent(:report, %{doing: :tracking})
+#			generate_strong_intent(:report, %{doing: :tracking})
     end
    end
 
@@ -389,7 +426,7 @@ defmodule Marvin.Puppy.Behaviors do
 		fn(_percept, _state) ->
 			Logger.info("STOP TRACKING")
 			turn_on_green_leds()
-			generate_intent(:report, %{stopping: :tracking})
+#			generate_intent(:report, %{stopping: :tracking})
 		end
 	end
  
@@ -420,9 +457,9 @@ defmodule Marvin.Puppy.Behaviors do
 	defp express_food_nearby() do
 		fn(%Percept{about: :food_nearby, value: channel}, _state) ->
 			Logger.info("EXPRESSING food nearby (channel = #{channel})")
-			generate_intent(:say_food_nearby)
-			generate_intent(:broadcast, %{feeling: :food_nearby})
-			generate_intent(:report, %{feeling: :food_nearby,
+			generate_strong_intent(:say_food_nearby)
+			generate_strong_intent(:broadcast, %{feeling: :food_nearby})
+			generate_strong_intent(:report, %{feeling: :food_nearby,
 																 channel: channel})
 		end
 	end
@@ -431,9 +468,9 @@ defmodule Marvin.Puppy.Behaviors do
     fn(_percept, _state) ->
       red_lights()
 			Logger.info("PANICKING")
-      generate_intent(:say_scared)
- 			generate_intent(:broadcast, %{feeling: :panic})
- 			generate_intent(:report, %{feeling: :panic})
+      generate_strong_intent(:say_scared)
+ 			generate_strong_intent(:broadcast, %{feeling: :panic})
+ 			generate_strong_intent(:report, %{feeling: :panic})
 		end
   end
 	

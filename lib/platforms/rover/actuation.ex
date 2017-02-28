@@ -232,7 +232,7 @@ defmodule Marvin.Rover.Actuation do
   defp say_tracking() do
     fn(_intent, sound_players) ->
       Script.new(:say_tracking, sound_players)
-      |> Script.add_step(:loud_speech, :speak, ["I am coming after you"])
+      |> Script.add_step(:loud_speech, :speak, ["It's mine. Mine. Mine."])
     end
   end
   
@@ -246,7 +246,7 @@ defmodule Marvin.Rover.Actuation do
   defp say_ok_now() do
     fn(_intent, sound_players) ->
       Script.new(:say_ok_now, sound_players)
-      |> Script.add_step(:loud_speech, :speak, ["I am ok now"])
+      |> Script.add_step(:loud_speech, :speak, ["I am ok"])
     end
   end
   
@@ -274,7 +274,7 @@ defmodule Marvin.Rover.Actuation do
   defp say_food_nearby() do
     fn(_intent, sound_players) ->
       Script.new(:say_food_near_by, sound_players)
-      |> Script.add_step(:loud_speech, :speak, ["I smell food!"])
+      |> Script.add_step(:loud_speech, :speak, ["Smells good!"])
     end
   end
   

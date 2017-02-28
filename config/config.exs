@@ -30,14 +30,14 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
-
 config :marvin,
 platforms: %{"mock_rover" => Marvin.MockRover.Platform,
 						 "rover" => Marvin.Rover.Platform,
 						 "hub" => Marvin.Hub.Platform},
 profiles: %{"puppy" => Marvin.Puppy.Profile,
 						"mommy" => Marvin.Mommy.Profile},
-max_percept_age: 2000,
+tick_interval: 1500,
+max_percept_age: 1500,
 max_motive_age: 3000,
 max_intent_age: 1500,
 strong_intent_factor: 3,
@@ -50,14 +50,17 @@ very_slow_rps: 0.3
 
 # Configures the endpoint
 config :marvin, Marvin.Endpoint,
+serve_endpoints: true,
 url: [host: (System.get_env("MARVIN_HOST") || "localhost"),
-			port: String.to_integer(System.get_env("MARVIN_PORT") || "4000")],
-http: [port: String.to_integer(System.get_env("MARVIN_PORT") || "4000")],
+			port: (System.get_env("MARVIN_PORT") || "4000") 
+		 ],
+http: [port: System.get_env("MARVIN_PORT") || "4000"],
 root: Path.dirname(__DIR__),
 secret_key_base: "BtqMSrya4yeaCROpSicDZyFSgm+BRcaMaegBORz1SK/oQT811zd4IBnsxg1HLsCn",
 render_errors: [accepts: ~w(html json)],
 pubsub: [name: Hub.PubSub,
          adapter: Phoenix.PubSub.PG2]
+
 
 	# Configures Elixir's Logger
 # config :logger, :log

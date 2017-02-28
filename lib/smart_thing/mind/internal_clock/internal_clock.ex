@@ -7,17 +7,16 @@ defmodule Marvin.SmartThing.InternalClock do
   import Marvin.SmartThing.Utils
 
   @name __MODULE__
-  @tick 1000
 
   def start_link() do
     {:ok, pid} = Agent.start_link(
       fn() ->
-        %{responsive: false, tock: nil}
+        %{responsive: false, tock: nil, count: 0}
       end,
       [name: @name]
     )
 		spawn_link(fn() ->
-			:timer.sleep(@tick)
+			:timer.sleep(tick_interval())
 			tick_tock()
 		end)
 		Logger.info("#{@name} started")
@@ -32,9 +31,10 @@ defmodule Marvin.SmartThing.InternalClock do
           tock = now()
           Logger.info("tick")
 					CNS.notify_tick()
-          Percept.new_transient(about: :time_elapsed, value: tock - state.tock)
+          Percept.new_transient(about: :time_elapsed,
+																value: %{delta: tock - state.tock, count: state.count})
           |> CNS.notify_perceived()
-          %{state | tock: tock}
+          %{state | tock: tock, count: state.count + 1}
         else
 					Logger.info(" no tick")
           state
@@ -65,7 +65,7 @@ defmodule Marvin.SmartThing.InternalClock do
 	### Private
 
 	defp tick_tock() do
-		:timer.sleep(@tick)
+		:timer.sleep(tick_interval())
 		tick()
 		tick_tock()
 	end

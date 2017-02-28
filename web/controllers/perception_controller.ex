@@ -8,6 +8,11 @@ defmodule Marvin.PerceptionController do
 	import Marvin.SmartThing.Utils, only: [now: 0]
 	require Logger
 
+	def handle_hello(conn, _) do
+		Logger.info("Hello!")
+		json(conn, :ok)
+	end
+
 	@doc "Handle incoming perception from another community"
 	def handle_percept(conn,
 										 %{"percept" => %{"about" => about_s,
@@ -20,6 +25,7 @@ defmodule Marvin.PerceptionController do
 																		 }
 											}
 			) do
+#		Logger.info("Received #{inspect remote_percept}")
 		{about, []} = Code.eval_string(about_s)
 		{value, []} = Code.eval_string(value_s)
 		percept = Percept.new(about: about,

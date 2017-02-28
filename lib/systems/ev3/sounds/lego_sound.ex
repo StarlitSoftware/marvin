@@ -43,8 +43,10 @@ defmodule Marvin.Ev3.LegoSound do
 	
   @doc "Speak out words with a given volume, speed and voice"
   def speak(words, volume, speed, voice \\ "en") do
-		# :os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}" --stdout | aplay')
-		# :os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}"')
+		spawn(fn() ->
+			:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}" --stdout | aplay')
+			:os.cmd('espeak -a #{volume} -s #{speed} -v #{voice} "#{words}"')
+		end)
 		SmartThing.display(words)
   end
 

@@ -4,6 +4,14 @@ defmodule Marvin.SmartThing.Utils do
 
 	alias Marvin.SmartThing
 
+	def timeout() do
+		10000
+	end
+
+	def tick_interval() do
+		Application.fetch_env!(:marvin, :tick_interval)
+	end
+
 	def max_percept_age() do
 		Application.fetch_env!(:marvin, :max_percept_age)
 	end

@@ -9,6 +9,7 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 	use GenServer
 	
 	@name __MODULE__
+	@timeout 20_000
 
   def start_link() do
 		Logger.info("Starting #{@name}")
@@ -25,6 +26,10 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 		GenServer.cast(@name, {:send_percept, url, about, value})
 	end
 
+	def send_hello(url) do
+		GenServer.call(@name, {:hello, url}, @timeout)
+	end
+
 	def senses_awakened_by(_sense) do
 		[]
 	end
@@ -36,7 +41,7 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 	####
 
 	def remote_percept(percept) do
-		Logger.info("Received remote percept #{inspect(percept.about)}=#{inspect(percept.value)} from #{inspect(percept.source)}")
+#		Logger.info("Received remote percept #{inspect(percept.about)}=#{inspect(percept.value)} from #{inspect(percept.source)}")
 		CNS.notify_perceived(percept)
 	end
 	
@@ -46,8 +51,21 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 		{:ok, []}
 	end
 
+	def handle_call({:hello, partial_url}, _from, state) do
+		full_url = "http://#{partial_url}/api/marvin/hello"
+		Logger.info("Saying hello to #{full_url}")
+		case HTTPoison.get(full_url, headers(), options()) do
+			{:error, reason} ->
+				Logger.warn("Failed to reach #{full_url}: #{inspect reason}")
+				{:reply, {:error, reason}, state}
+			{:ok, _} ->
+				Logger.info("Hello answered")
+				{:reply, :ok, state}
+		end
+	end
+
 	def handle_cast({:send_percept, partial_url, about, value}, state) do
-		full_url = "http://#{partial_url}/api/marvin/percept"
+		full_url = "#{partial_url}/api/marvin/percept"
 		body = %{percept: %{about: "#{inspect about}",
 												value: %{is: "#{inspect(value)}",
 																 from: %{community_name: SmartThing.community_name(),
@@ -56,15 +74,22 @@ defmodule Marvin.SmartThing.RESTCommunicator do
 																				 id_channel: SmartThing.id_channel()}}
 											 }
 						} |> Poison.encode!()
-		headers = [{"Content-Type", "application/json"}]
-		Logger.info("Posting to #{full_url} with #{inspect body}")
-		case HTTPoison.post(full_url, body, headers) do
+#		Logger.info("Posting to #{full_url} with #{inspect body}")
+		case HTTPoison.post(full_url, body, headers(), options()) do
 			{:ok, _response} ->
 				Logger.info("Sent percept :report #{inspect value} to #{full_url}")
 			{:error, reason} ->
 				Logger.warn("FAILED to send percept #{inspect about} #{inspect value} to #{full_url} - #{inspect reason}")
 		end
 		{:noreply, state}
+	end
+
+	defp headers() do
+		[{"Content-Type", "application/json"}]
+	end
+
+	def options() do
+		[connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
 	end
 
 end

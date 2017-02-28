@@ -3,17 +3,14 @@ defmodule Marvin.SmartThing.Percept do
 	
 	import Marvin.SmartThing.Utils
 
-	@doc """
-  about: What is being perceived
-  value: The measurement/value of the perception (a number, atom etc.)
-  since: When the perception happened
-  until: Time at which the perception is still unchanged
-  source: The source of the perception (a detector or perceptor)
-  ttl: How long the percept is to be retained in memory
-  resolution: The precision of the detector or perceptor. Nil if perfect resolution.
-  transient: If true, the percept will not be memorized
-  """
-	defstruct about: nil, value: nil, since: nil, until: nil, source: nil, ttl: nil, resolution: nil, transient: false
+	defstruct about: nil, # What is being perceived
+	value: nil,           # The measurement/value of the perception (a number, atom etc.)
+	since: nil,           # When the perception happened
+	until: nil,           # Time at which the perception is still unchanged
+	source: nil,          # The source of the perception (a detector or perceptor)
+	ttl: nil,             # How long the percept is to be retained in memory
+	resolution: nil,      # The precision of the detector or perceptor. Nil if perfect resolution.
+	transient: false      # If true, the percept will not be memorized
 
 	@doc "Create a new percept with sense and value set"
 	def new(about: sense, value: value) do

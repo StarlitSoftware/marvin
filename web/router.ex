@@ -23,6 +23,7 @@ defmodule Marvin.Router do
     pipe_through :api
 
     post "/marvin/percept", PerceptionController, :handle_percept
+		get "/marvin/hello", PerceptionController, :handle_hello
   end
 
 end
