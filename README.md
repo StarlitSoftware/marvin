@@ -40,7 +40,9 @@ To start your Nerves app:
 
 ## Learn more
 
-  * Official docs: https://hexdocs.pm/nerves/getting-started.html
-  * Official website: http://www.nerves-project.org/
+  * Slides from ElixirDaze 2016: https://drive.google.com/file/d/0ByoiJJWsFDrUWjVIRGNZUHhxSk0/view?usp=sharing
+  * Slides from ElixirDaze 2017: https://drive.google.com/file/d/0ByoiJJWsFDrUOWJxRTZOMVoxZ2M/view?usp=sharing
+  * Official Nerves docs: https://hexdocs.pm/nerves/getting-started.html
+  * Official Nerves website: http://www.nerves-project.org/
   * Discussion Slack elixir-lang #nerves ([Invite](https://elixir-slackin.herokuapp.com/))
   * Source: https://github.com/nerves-project/nerves
